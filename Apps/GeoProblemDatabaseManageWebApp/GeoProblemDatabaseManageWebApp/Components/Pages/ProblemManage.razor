@@ -1,0 +1,263 @@
+﻿@page "/"
+@page "/ProblemManage"
+@using GeoProblemDatabaseManageWebApp.Resources
+@using GeoProblemDatabases.Collections
+@using GeoProblemDatabases.Models
+@using GeoProblemDatabaseManageWebApp.Models
+@inject GeoProblemDatabases.Databases.GeoProblemDatabase db
+@inject NavigationManager NavigationManager
+@inject IDialogService DialogService
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+
+<MudPaper Height="850px" Style="overflow: auto; position:relative;">
+    <MudDrawerContainer Class="mud-height-full">
+        <MudDrawer Open="@showLeft" Width="150px" Elevation="0" Variant="@DrawerVariant.Persistent" Color="Color.Primary">
+            <MudDrawerHeader>
+                <MudText Typo="Typo.h6">题目库列表</MudText>
+            </MudDrawerHeader>
+            <MudList T="string">
+                @foreach (var name in collectionNames)
+                {
+                    <MudListItem OnClick="()=>{
+ToCollection(name);
+RefreashPage();}">@name</MudListItem>
+                }
+            </MudList>
+        </MudDrawer>
+
+        <MudStack Row="true">
+            <MudButton Variant="Variant.Filled" Color="Color.Surface"
+            OnClick="()=>{
+showLeft=!showLeft;
+}">@showLeftText</MudButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Surface"
+            OnClick="AddProblem">添加题目</MudButton>
+
+        </MudStack>
+        <MudTable T="GeoProblemDAO" Items="@displayGeoProblems">
+            <HeaderContent>
+                <MudTh>ID</MudTh>
+                <MudTh>标题</MudTh>
+                <MudTh>功能</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="ID">@context.Id</MudTd>
+                <MudTd DataLabel="标题">@context.Title</MudTd>
+                <MudTd DataLabel="功能">
+                    <MudStack Row="true">
+                        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="()=>EditProblem(context.Id)">修改</MudButton>
+                        <MudButton Variant="Variant.Filled" Color="Color.Error" OnClick="()=>DelProblem(context.Id)">删除</MudButton>
+                    </MudStack>
+                </MudTd>
+            </RowTemplate>
+        </MudTable>
+
+        <MudStack Row="true">
+            <MudButton Variant="Variant.Filled" Color="Color.Surface"
+            OnClick="PerviousPage">上一页</MudButton>
+            <MudNumericField Style="width:80px;" Label="页码" @bind-Value="PageIndex" />
+            <MudText Color="Color.Surface" Style="width:100px;">/@MaxPageSize</MudText>
+            <MudButton Variant="Variant.Filled" Color="Color.Surface"
+            OnClick="ToPage">转到</MudButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Surface"
+            OnClick="NextPage">下一页</MudButton>
+        </MudStack>
+    </MudDrawerContainer>
+
+</MudPaper>
+
+
+@code {
+    bool showLeft { get; set; } = true;
+    string showLeftText { get; set; } = "控制左侧";
+    protected override void OnParametersSet()
+    {
+
+        base.OnParametersSet();
+    }
+    protected override async Task OnParametersSetAsync()
+    {
+        try
+        {
+            RefreshCollectionNames();
+            var selectedDatabaseName=await localStorage.GetItemAsync<string>(LocalStorageKeys.SelectedDatabaseName);
+            var SelectedPageNum = await localStorage.GetItemAsync<int>(LocalStorageKeys.SelectedPageNum);
+            ToCollection(selectedDatabaseName);
+            this.PageIndex = SelectedPageNum;
+            RefreashPage();
+        }
+        catch
+        {
+
+        }
+        return ;
+
+
+    }
+    List<string> collectionNames = new List<string>();
+    void RefreshCollectionNames()
+    {
+        collectionNames = new(db.GetCollectionNames());
+        collectionNames.Sort();
+        StateHasChanged();
+    }
+    string selectedCollectionName;
+    GeoProblemCollection gc;
+    ImageCollection ic;
+    InferenceInputCollection iic;
+    InferenceOutputCollection ioc;
+    async void ToCollection(string name)
+    {   
+        if (selectedCollectionName != name)
+        {
+            gc = GeoProblemCollection.Get(name);
+            ic = ImageCollection.Get(name);
+            iic = InferenceInputCollection.Get(name);
+            ioc = InferenceOutputCollection.Get(name);
+            geoProblems = gc.GetAllProblemInfo();
+            MaxPageSize= geoProblems.Count / 10;
+            selectedCollectionName = name;
+            await localStorage.SetItemAsync(LocalStorageKeys.SelectedDatabaseName,name);
+            await localStorage.SetItemAsync(LocalStorageKeys.SelectedPageNum, 0);
+        }
+    }
+
+    List<GeoProblemDAO> geoProblems = new List<GeoProblemDAO>();
+    Dictionary<string, GeoProblemInfo> cachedGeoProblems = new();
+    List<GeoProblemDAO> displayGeoProblems = new List<GeoProblemDAO>();
+    int MaxPageSize { get; set; } = -1;
+    int PageSize { get; set; } = 10;
+    int PageIndex { get; set; } = 0;
+
+    public async void NextPage()
+    {
+        PageIndex += 1;
+        if (PageIndex <= 0)
+        {
+            PageIndex = 0;
+        }
+        else if (PageIndex >= MaxPageSize)
+        {
+            PageIndex = MaxPageSize;
+        }
+
+        try
+        {
+            RefreashPage();
+            await localStorage.SetItemAsync(LocalStorageKeys.SelectedPageNum, PageIndex);
+        }
+        catch
+        {
+            PageIndex = 0;
+            await localStorage.SetItemAsync(LocalStorageKeys.SelectedPageNum, 0);
+            RefreashPage();
+        }
+    }
+    public async void PerviousPage()
+    {
+        PageIndex -= 1;
+        if (PageIndex<=0){
+            PageIndex = 0;
+        }
+        else if (PageIndex >=MaxPageSize)
+        {
+            PageIndex = MaxPageSize;
+        }
+
+        try
+        {
+            RefreashPage();
+            await localStorage.SetItemAsync(LocalStorageKeys.SelectedPageNum, PageIndex);
+        }
+        catch
+        {
+
+            PageIndex = 0;
+            await localStorage.SetItemAsync(LocalStorageKeys.SelectedPageNum, 0);
+            RefreashPage();
+        }
+    }
+    public async void ToPage()
+    {
+        try{
+            if (PageIndex <= 0)
+            {
+                PageIndex = 0;
+            }
+            else if (PageIndex >= MaxPageSize)
+            {
+                PageIndex = MaxPageSize;
+            }
+            RefreashPage();
+        }
+        catch{}
+
+    }
+
+    public void RefreashPage()
+    {
+        if (gc is null) return;
+        geoProblems = gc.GetAllProblemInfo();
+        var problems= geoProblems.Skip(PageIndex * PageSize).Take(PageSize);
+        displayGeoProblems.Clear();
+        foreach (var problem in problems)
+        {
+            if (cachedGeoProblems.ContainsKey(problem.Id))
+            {
+                displayGeoProblems.Add(cachedGeoProblems[problem.Id].GeoProblemDAO);
+            }
+            else
+            {
+                var problemShort = gc.GeoProblemShort(problem.Id);
+                displayGeoProblems.Add(problemShort);
+                cachedGeoProblems.Add(problem.Id, new GeoProblemInfo() { GeoProblemDAO = problemShort });
+            }
+
+        }
+        StateHasChanged();
+    }
+    public void AddProblem()
+    {
+        GeoProblemDAO problemDAO = new GeoProblemDAO();
+        problemDAO.Title = "未命名";
+        gc.Insert(problemDAO);
+
+        var inputDAO = new InferenceInputDAO();
+        inputDAO.ProblemID = problemDAO.Id;
+        iic.Insert(inputDAO);
+
+        var outputDAO = new InferenceOutputDAO();
+        outputDAO.ProblemID = problemDAO.Id;
+        ioc.Insert(outputDAO);
+
+        geoProblems = gc.GetAllProblemInfo();
+        RefreashPage();
+    }
+    public async void EditProblem(string id)
+    {
+        await localStorage.SetItemAsync(LocalStorageKeys.SelectedPageNum, PageIndex);
+        NavigationManager.NavigateTo($"/ProblemEdit/{selectedCollectionName}/{id}");
+    }
+    public async void DelProblem(string id)
+    {
+        var parameters = new DialogParameters();
+        parameters.Add("ContentText", "你确定要执行此操作吗？");
+        parameters.Add("ButtonText", "确认");
+        parameters.Add("Color", Color.Primary);
+
+        var dialog = DialogService.Show<ConfirmDialog>("确认", parameters);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            gc.Delete(id);
+            ic.Delete(id);
+            iic.Delete(id);
+            ioc.Delete(id);
+            geoProblems = gc.GetAllProblemInfo();
+            RefreashPage();
+        }
+
+        
+    }
+}

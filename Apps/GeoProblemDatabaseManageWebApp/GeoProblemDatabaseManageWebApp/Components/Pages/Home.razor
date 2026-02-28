@@ -1,0 +1,49 @@
+﻿@page "/Home"
+@using GeoProblemDatabases.Collections
+@using MongoDB.Driver;
+@inject GeoProblemDatabases.Databases.GeoProblemDatabase db
+<MudText Typo="Typo.h3" class="text-center">全局</MudText>
+
+<MudChart Style="width:1000px" ChartType="ChartType.Bar" ChartSeries="@Series" XAxisLabels="@XAxisLabels" Width="100%" Height="350px">
+</MudChart>
+@code{
+    public List<ChartSeries> Series = new List<ChartSeries>()
+    {
+        new ChartSeries() { Name = "United States", Data = new double[] { 40, 20, 25, 27, 46, 60, 48, 80, 15 } },
+    };
+    public string[] XAxisLabels = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep" };
+
+    List<string> collectionNames = new List<string>();
+    protected override Task OnInitializedAsync()
+    {
+        ReCount();
+        return base.OnInitializedAsync();
+    }
+    public void ReCount()
+    {
+        //设置标签
+        collectionNames = new(db.GetCollectionNames());
+        collectionNames = collectionNames.Where(name => !name.Contains("Try")).ToList();
+        XAxisLabels = collectionNames.ToArray();
+
+        Series.Clear();
+        ChartSeries chartSeries = new ChartSeries();
+        chartSeries.Name = "题目数量";
+        //获取题目数量
+        var problemNums = new List<double>();
+        foreach (var name in collectionNames)
+        {
+            var num = GeoProblemCollection.Get(name).GetCount();
+            problemNums.Add(num);
+        }
+        chartSeries.Data = problemNums.ToArray();
+        Series.Add(chartSeries);
+       
+        ChartSeries chartSeries2 = new ChartSeries();
+        chartSeries2.Name = "成功解题数量";
+        chartSeries2.Data = Enumerable.Repeat(0.0, problemNums.Count).ToArray();
+        Series.Add(chartSeries2);
+        
+        this.StateHasChanged();
+    }
+}

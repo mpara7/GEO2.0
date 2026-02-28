@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GeoInferenceEngine.Backbone\GeoInferenceEngine.Backbone.csproj" />
+    <ProjectReference Include="..\GeoInferenceEngine.PredicateShared\GeoInferenceEngine.PredicateShared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Imps\Componments\Cal\GeoCalHandler\" />
+    <Folder Include="PRs\CPredicates\MakeFigure\Circle\" />
+    <Folder Include="PRs\CPredicates\MakeFigure\MakeArc\" />
+	<Folder Remove="Imps\Componments\Cal\GeoCalHandler\" />
+  </ItemGroup>
+
+</Project>

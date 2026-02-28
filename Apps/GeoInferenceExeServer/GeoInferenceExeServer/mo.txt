@@ -1,0 +1,70 @@
+EnginePreparer: GeoInferenceEngine.EquivalencePlaneGeometry.Imps.Modules.ZScriptInputEnginePreparer, GeoInferenceEngine.EquivalencePlaneGeometry, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+Engine: GeoInferenceEngine.EquivalencePlaneGeometry.Engine.Modules.InferenceEngine, GeoInferenceEngine.EquivalencePlaneGeometry, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+EngineOutputGetter: GeoInferenceEngine.Backbone.Imps.Modules.EngineOutputGetter, GeoInferenceEngine.EquivalencePlaneGeometry, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+DataBases:
+- Item1: GeoInferenceEngine.EquivalencePlaneGeometry.Engine.Modules.EngineInfo, GeoInferenceEngine.EquivalencePlaneGeometry, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  Item2: GeoInferenceEngine.EquivalencePlaneGeometry.Engine.Modules.EngineInfo, GeoInferenceEngine.EquivalencePlaneGeometry, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+- Item1: GeoInferenceEngine.EquivalencePlaneGeometry.Imps.DataBases.KnowledgeBase, GeoInferenceEngine.EquivalencePlaneGeometry, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  Item2: GeoInferenceEngine.EquivalencePlaneGeometry.Imps.DataBases.KnowledgeBase, GeoInferenceEngine.EquivalencePlaneGeometry, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+- Item1: GeoInferenceEngine.EquivalencePlaneGeometry.Imps.Componments.Cal.Models.FormularBase, GeoInferenceEngine.EquivalencePlaneGeometry, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  Item2: GeoInferenceEngine.EquivalencePlaneGeometry.Imps.Componments.Cal.Models.FormularBase, GeoInferenceEngine.EquivalencePlaneGeometry, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+- Item1: GeoInferenceEngine.EquivalencePlaneGeometry.Imps.DataBases.RuleBase, GeoInferenceEngine.EquivalencePlaneGeometry, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  Item2: GeoInferenceEngine.EquivalencePlaneGeometry.Imps.DataBases.RuleBase, GeoInferenceEngine.EquivalencePlaneGeometry, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+- Item1: GeoInferenceEngine.EquivalencePlaneGeometry.Imps.DataBases.PRAssembliesBase, GeoInferenceEngine.EquivalencePlaneGeometry, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  Item2: GeoInferenceEngine.EquivalencePlaneGeometry.Imps.DataBases.PRAssembliesBase, GeoInferenceEngine.EquivalencePlaneGeometry, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+- Item1: GeoInferenceEngine.EquivalencePlaneGeometry.Imps.DataBases.TargetBase, GeoInferenceEngine.EquivalencePlaneGeometry, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  Item2: GeoInferenceEngine.EquivalencePlaneGeometry.Imps.DataBases.TargetBase, GeoInferenceEngine.EquivalencePlaneGeometry, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+Configs:
+- Item1: GeoInferenceEngine.EquivalencePlaneGeometry.Imps.Modules.ZScriptInputEnginePreparerConfig, GeoInferenceEngine.EquivalencePlaneGeometry, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  Item2: >+
+    IsAcceptAuxiliary: true
+
+    IsThrowZScriptParseExextion: true
+- Item1: GeoInferenceEngine.EquivalencePlaneGeometry.Imps.Componments.LoggerConfig, GeoInferenceEngine.EquivalencePlaneGeometry, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  Item2: >+
+    IsToConsole: false
+- Item1: GeoInferenceEngine.EquivalencePlaneGeometry.Imps.Componments.PRs.PairMakers.RoundPairMakerConfig, GeoInferenceEngine.EquivalencePlaneGeometry, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  Item2: >+
+    MaxRoundPairNum: 100000
+- Item1: GeoInferenceEngine.PlaneGeometry.Rules.PointConnectionConfig, GeoInferenceEngine.EquivalencePlaneGeometry, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  Item2: >+
+    IsAutoConnect: false
+Components:
+- Item1: GeoInferenceEngine.EquivalencePlaneGeometry.Imps.Componments.Executors.PlaneExecutor, GeoInferenceEngine.EquivalencePlaneGeometry, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  Item2: GeoInferenceEngine.EquivalencePlaneGeometry.Imps.Componments.Executors.PlaneExecutor, GeoInferenceEngine.EquivalencePlaneGeometry, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+- Item1: GeoInferenceEngine.EquivalencePlaneGeometry.Imps.Componments.StopJudges.SolvingStopJudge, GeoInferenceEngine.EquivalencePlaneGeometry, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  Item2: GeoInferenceEngine.EquivalencePlaneGeometry.Imps.Componments.StopJudges.AStopJudge, GeoInferenceEngine.EquivalencePlaneGeometry, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+- Item1: GeoInferenceEngine.EquivalencePlaneGeometry.Imps.Componments.Cal.GroupCalExecutor, GeoInferenceEngine.EquivalencePlaneGeometry, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  Item2: GeoInferenceEngine.EquivalencePlaneGeometry.Imps.Componments.ACalExecutor, GeoInferenceEngine.EquivalencePlaneGeometry, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+- Item1: GeoInferenceEngine.EquivalencePlaneGeometry.Imps.Componments.Logger, GeoInferenceEngine.EquivalencePlaneGeometry, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  Item2: GeoInferenceEngine.EquivalencePlaneGeometry.Imps.Componments.Logger, GeoInferenceEngine.EquivalencePlaneGeometry, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+- Item1: GeoInferenceEngine.EquivalencePlaneGeometry.Imps.Componments.PRs.KnowledgeAddProcessor, GeoInferenceEngine.EquivalencePlaneGeometry, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  Item2: GeoInferenceEngine.EquivalencePlaneGeometry.Imps.Componments.PRs.KnowledgeAddProcessor, GeoInferenceEngine.EquivalencePlaneGeometry, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+- Item1: GeoInferenceEngine.EquivalencePlaneGeometry.Imps.Componments.Cal.CalAddProcessor, GeoInferenceEngine.EquivalencePlaneGeometry, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  Item2: GeoInferenceEngine.EquivalencePlaneGeometry.Imps.Componments.Cal.CalAddProcessor, GeoInferenceEngine.EquivalencePlaneGeometry, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+- Item1: GeoInferenceEngine.EquivalencePlaneGeometry.Imps.Componments.PRs.PairMakers.PairMaker, GeoInferenceEngine.EquivalencePlaneGeometry, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  Item2: GeoInferenceEngine.EquivalencePlaneGeometry.Imps.Componments.PRs.PairMakers.PairMaker, GeoInferenceEngine.EquivalencePlaneGeometry, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+- Item1: GeoInferenceEngine.EquivalencePlaneGeometry.Imps.Componments.PRs.RuleProviders.RuleProvider, GeoInferenceEngine.EquivalencePlaneGeometry, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  Item2: GeoInferenceEngine.EquivalencePlaneGeometry.Imps.Componments.PRs.RuleProviders.RuleProvider, GeoInferenceEngine.EquivalencePlaneGeometry, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+PlugIns:
+- GeoInferenceEngine.EquivalencePlaneGeometry.Imps.PlugIns.GraphicsCompletePlugIn, GeoInferenceEngine.EquivalencePlaneGeometry, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+ProcessInfoGetters: []
+ResultGetters:
+- Name: default
+  TypeName: GeoInferenceEngine.EquivalencePlaneGeometry.IO.Outputs.HumanLikeAnswerOutputMaker, GeoInferenceEngine.EquivalencePlaneGeometry, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  Configs:
+    GeoInferenceEngine.EquivalencePlaneGeometry.IO.Outputs.HumanoidAnswerMakerConfig, GeoInferenceEngine.EquivalencePlaneGeometry, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null: >+
+      IsSlim: true
+  PlugIns: []
+- Name: default
+  TypeName: GeoInferenceEngine.EquivalencePlaneGeometry.IO.Outputs.KnowledgeBaseOutputMaker, GeoInferenceEngine.EquivalencePlaneGeometry, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  Configs:
+    GeoInferenceEngine.EquivalencePlaneGeometry.IO.Outputs.KnowledgeBaseOutputMakerConfig, GeoInferenceEngine.EquivalencePlaneGeometry, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null: >+
+      IsSlim: true
+  PlugIns: []
+- Name: default
+  TypeName: GeoInferenceEngine.EquivalencePlaneGeometry.IO.Outputs.LogOutputMaker, GeoInferenceEngine.EquivalencePlaneGeometry, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  Configs: {}
+  PlugIns: []
+WithInferenceInputs:
+- GeoInferenceEngine.PredicateShared.Imps.IOs.Inputs.ZScriptInput, GeoInferenceEngine.PredicateShared, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null

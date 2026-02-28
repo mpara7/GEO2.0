@@ -1,0 +1,50 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35312.102
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GeoProblemDatabaseManageWebApp", "GeoProblemDatabaseManageWebApp\GeoProblemDatabaseManageWebApp.csproj", "{E3C79367-7994-482C-98FB-DDD6E6468EE7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "refs", "refs", "{6B788DFC-0A3C-440E-8D6B-3C6E93ECBF93}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZTool.Databases.Mongo", "..\..\ZTool\ZTool.Databases\ZTool.Databases.Mongo\ZTool.Databases.Mongo.csproj", "{5CCA7AC6-8ED0-4A7D-865B-CC528385CE45}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZTool.Databases", "..\..\ZTool\ZTool.Databases\ZTool.Databases\ZTool.Databases.csproj", "{3244405D-91CA-4D9D-8429-2A4966C18469}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GeoProblemDatabases", "..\..\GeoProblemDatabases\GeoProblemDatabases.csproj", "{DF2C8B9B-2C15-4459-8F39-0A4659942445}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E3C79367-7994-482C-98FB-DDD6E6468EE7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E3C79367-7994-482C-98FB-DDD6E6468EE7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E3C79367-7994-482C-98FB-DDD6E6468EE7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E3C79367-7994-482C-98FB-DDD6E6468EE7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5CCA7AC6-8ED0-4A7D-865B-CC528385CE45}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5CCA7AC6-8ED0-4A7D-865B-CC528385CE45}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5CCA7AC6-8ED0-4A7D-865B-CC528385CE45}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5CCA7AC6-8ED0-4A7D-865B-CC528385CE45}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3244405D-91CA-4D9D-8429-2A4966C18469}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3244405D-91CA-4D9D-8429-2A4966C18469}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3244405D-91CA-4D9D-8429-2A4966C18469}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3244405D-91CA-4D9D-8429-2A4966C18469}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DF2C8B9B-2C15-4459-8F39-0A4659942445}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DF2C8B9B-2C15-4459-8F39-0A4659942445}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DF2C8B9B-2C15-4459-8F39-0A4659942445}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DF2C8B9B-2C15-4459-8F39-0A4659942445}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{5CCA7AC6-8ED0-4A7D-865B-CC528385CE45} = {6B788DFC-0A3C-440E-8D6B-3C6E93ECBF93}
+		{3244405D-91CA-4D9D-8429-2A4966C18469} = {6B788DFC-0A3C-440E-8D6B-3C6E93ECBF93}
+		{DF2C8B9B-2C15-4459-8F39-0A4659942445} = {6B788DFC-0A3C-440E-8D6B-3C6E93ECBF93}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F0316473-D9D6-4E94-A767-ECEE29EE4624}
+	EndGlobalSection
+EndGlobal

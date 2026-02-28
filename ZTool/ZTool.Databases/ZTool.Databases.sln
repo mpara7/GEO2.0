@@ -1,0 +1,49 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32616.157
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZTool.Databases", "ZTool.Databases\ZTool.Databases.csproj", "{8610CBF0-15A2-4603-B867-83229AF1E491}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZTool.Databases.Mongo", "ZTool.Databases.Mongo\ZTool.Databases.Mongo.csproj", "{FE61ECE4-6F8D-4639-A690-8011D067724C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZTool.Databases.Usage", "ZTool.Databases.Usage\ZTool.Databases.Usage.csproj", "{FA0C0615-E67D-45C1-8987-B5238F9EF75A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZTool.Databases.Http.Server", "ZTool.Databases.Http.Server\ZTool.Databases.Http.Server.csproj", "{299780D4-5B83-4EA0-B378-38166976E9B4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZTool.Databases.Http.Client", "ZTool.Databases.Http.Client\ZTool.Databases.Http.Client.csproj", "{087C0405-C5D3-4C4E-BC2A-A3ABED1ACC5D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8610CBF0-15A2-4603-B867-83229AF1E491}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8610CBF0-15A2-4603-B867-83229AF1E491}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8610CBF0-15A2-4603-B867-83229AF1E491}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8610CBF0-15A2-4603-B867-83229AF1E491}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FE61ECE4-6F8D-4639-A690-8011D067724C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE61ECE4-6F8D-4639-A690-8011D067724C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE61ECE4-6F8D-4639-A690-8011D067724C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE61ECE4-6F8D-4639-A690-8011D067724C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FA0C0615-E67D-45C1-8987-B5238F9EF75A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FA0C0615-E67D-45C1-8987-B5238F9EF75A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FA0C0615-E67D-45C1-8987-B5238F9EF75A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FA0C0615-E67D-45C1-8987-B5238F9EF75A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{299780D4-5B83-4EA0-B378-38166976E9B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{299780D4-5B83-4EA0-B378-38166976E9B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{299780D4-5B83-4EA0-B378-38166976E9B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{299780D4-5B83-4EA0-B378-38166976E9B4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{087C0405-C5D3-4C4E-BC2A-A3ABED1ACC5D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{087C0405-C5D3-4C4E-BC2A-A3ABED1ACC5D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{087C0405-C5D3-4C4E-BC2A-A3ABED1ACC5D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{087C0405-C5D3-4C4E-BC2A-A3ABED1ACC5D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A64ECD20-F649-421C-AB39-C983076994AB}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Apps\GeoProblemDatabaseDLL\GeoProblemDatabaseDLL\GeoProblemDatabaseDLL.csproj" />
+    <ProjectReference Include="..\GeoInferenceEngine.Backbone\GeoInferenceEngine.Backbone.csproj" />
+    <ProjectReference Include="..\GeoInferenceEngine.EquivalencePlaneGeometry\GeoInferenceEngine.EquivalencePlaneGeometry.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="ProblemTests\Configs\题目求解.zec">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="ProblemTests\配置\未命名.zec">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="ProblemTests\配置\解题测试.zec">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

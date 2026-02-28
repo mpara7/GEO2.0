@@ -1,0 +1,46 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35506.116
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeoProblemDatabaseDLL", "GeoProblemDatabaseDLL\GeoProblemDatabaseDLL.csproj", "{E766274A-2CFE-448C-991D-DA26DD448BFC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "refs", "refs", "{DC0E9A9A-6620-4307-9B57-49A5F950ED2B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeoProblemDatabaseDLL.Usage", "GeoProblemDatabaseDLL.Usage\GeoProblemDatabaseDLL.Usage.csproj", "{BF34B5A7-6FAA-4CA3-90A7-378DA0CEE4E8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeoInferenceEngine.PredicateShared", "..\..\GeoInferenceEngine\GeoInferenceEngine.PredicateShared\GeoInferenceEngine.PredicateShared.csproj", "{EF4A05E7-410C-44CF-B426-E1B1EE2F872A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeoProblemDatabases", "..\..\GeoProblemDatabases\GeoProblemDatabases.csproj", "{062ED2E0-C16C-49F5-A079-B879FDD33922}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E766274A-2CFE-448C-991D-DA26DD448BFC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E766274A-2CFE-448C-991D-DA26DD448BFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E766274A-2CFE-448C-991D-DA26DD448BFC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E766274A-2CFE-448C-991D-DA26DD448BFC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BF34B5A7-6FAA-4CA3-90A7-378DA0CEE4E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF34B5A7-6FAA-4CA3-90A7-378DA0CEE4E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF34B5A7-6FAA-4CA3-90A7-378DA0CEE4E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF34B5A7-6FAA-4CA3-90A7-378DA0CEE4E8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EF4A05E7-410C-44CF-B426-E1B1EE2F872A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EF4A05E7-410C-44CF-B426-E1B1EE2F872A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EF4A05E7-410C-44CF-B426-E1B1EE2F872A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EF4A05E7-410C-44CF-B426-E1B1EE2F872A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{062ED2E0-C16C-49F5-A079-B879FDD33922}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{062ED2E0-C16C-49F5-A079-B879FDD33922}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{062ED2E0-C16C-49F5-A079-B879FDD33922}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{062ED2E0-C16C-49F5-A079-B879FDD33922}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{EF4A05E7-410C-44CF-B426-E1B1EE2F872A} = {DC0E9A9A-6620-4307-9B57-49A5F950ED2B}
+		{062ED2E0-C16C-49F5-A079-B879FDD33922} = {DC0E9A9A-6620-4307-9B57-49A5F950ED2B}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,6 @@
+@GeoInferenceSingleThreadExeServer_HostAddress = http://localhost:5252
+
+GET {{GeoInferenceSingleThreadExeServer_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

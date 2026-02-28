@@ -1,0 +1,23 @@
+syntax = "proto3";
+import "google/protobuf/empty.proto";
+import "google/protobuf/wrappers.proto";
+//google.protobuf.StringValue
+option csharp_namespace = "GeoInferenceEngine.Exe.Protos";
+
+service GeoInferenceEngineServer {
+  rpc SetInferenceInfo (google.protobuf.StringValue) returns (google.protobuf.Empty);
+
+  rpc GetEngineStatu (google.protobuf.Empty) returns (google.protobuf.StringValue);
+
+  rpc GetCrackedInfo  (google.protobuf.Empty) returns (google.protobuf.StringValue);
+
+  rpc GetProcessingInfo (google.protobuf.Empty) returns (google.protobuf.StringValue);
+  rpc GetResults  (google.protobuf.Empty) returns (google.protobuf.StringValue);
+
+  rpc Run (google.protobuf.Empty) returns (google.protobuf.Empty);
+  rpc Stop (google.protobuf.Empty) returns (google.protobuf.Empty);
+  rpc Break (google.protobuf.Empty) returns (google.protobuf.Empty);
+  rpc Continue (google.protobuf.Empty) returns (google.protobuf.Empty);
+
+  rpc Dispose (google.protobuf.Empty) returns (google.protobuf.Empty);
+}

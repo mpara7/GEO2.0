@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "ZTool.Databases.Mongo": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:58679;http://localhost:58683"
+    }
+  }
+}

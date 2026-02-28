@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.8" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\GeoInferenceEngine\GeoInferenceEngine.Backbone\GeoInferenceEngine.Backbone.csproj" />
+    <ProjectReference Include="..\..\..\GeoInferenceEngine\GeoInferenceEngine.EquivalencePlaneGeometry\GeoInferenceEngine.EquivalencePlaneGeometry.csproj" />
+    <ProjectReference Include="..\..\..\GeoInferenceEngine\GeoInferenceEngine.PredicateShared\GeoInferenceEngine.PredicateShared.csproj" />
+    <ProjectReference Include="..\..\GeoInferenceExe\GeoInferenceExe.Client\GeoInferenceExe.Client.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="mo.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="默认解题.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

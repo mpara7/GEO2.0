@@ -1,0 +1,263 @@
+﻿@page "/ProblemEdit/{collectionName}/{id}"
+@using System.Text.RegularExpressions
+@using GeoProblemDatabaseManageWebApp.Models;
+@using GeoProblemDatabases.Models;
+@using GeoProblemDatabases.Collections;
+@using System.Drawing;
+@using System.Drawing.Imaging;
+@using SixLabors.ImageSharp
+@using SixLabors.ImageSharp.Processing
+@using SixLabors.ImageSharp.Formats
+@using System.IO
+@inject ISnackbar Snackbar
+@inject NavigationManager NavigationManager
+<MudSnackbarProvider />
+<MudStack Row="true">
+    <MudButton OnClick="BackToManage">返回</MudButton>
+</MudStack>
+<ContextMenu Id="myMenu">
+    <Item OnClick="RotateImage">顺时针旋转</Item>
+    <Item OnClick="RRotateImage">逆时针旋转</Item>
+    <Item OnClick="DelImage">删除</Item>
+</ContextMenu>
+
+
+<MudForm Model="@Info" Style="width: 80%;" class="my-paper">
+    <MudTextField T="string" Label="题目标题" Variant="Variant.Outlined"
+    @bind-Value="Info.GeoProblemDAO.Title" Required="true" RequiredError="必须输入标题" />
+    上传题目原始图片（拍照、截图等）
+    <InputFile OnChange="(e)=>AddImage(e,nameof(Info.GeoProblemDAO.OrgPictureIDs))" accept=".jpg, .jpeg,.png" >
+    </InputFile>
+    <MudStack Row="true">
+        @foreach (var imageId in Info.GeoProblemDAO.OrgPictureIDs)
+        {
+            var imageDAO = ic.Find(imageId);
+            <MudPaper Class="pa-3">
+                <ContextMenuTrigger MenuId="myMenu" Data="@imageDAO.Id" WrapperTag="d">
+                    <MudImage Src="@($"data:image/jpeg;base64,{imageDAO.BASE64}")" Fluid="true" Alt="Swedish Farm House" Class="rounded-lg"></MudImage>
+                </ContextMenuTrigger>
+            </MudPaper>
+        }
+    </MudStack>
+
+    <MudTextField AutoGrow Lines="3" T="string" Label="题干" Variant="Variant.Outlined"
+    @bind-Value="Info.GeoProblemDAO.QuestionStem" />
+    上传题目图片（拍照、截图等）
+    <InputFile OnChange="(e)=>AddImage(e,nameof(Info.GeoProblemDAO.ProblemPictureIDs))" accept=".jpg, .jpeg,.png">上传题目图片（拍照、截图等）</InputFile>
+    <MudStack Row="true">
+        @foreach (var imageId in Info.GeoProblemDAO.ProblemPictureIDs)
+        {
+            var imageDAO = ic.Find(imageId);
+            <MudPaper Class="pa-3">
+                <ContextMenuTrigger MenuId="myMenu" Data="@imageDAO.Id" WrapperTag="d">
+                    <MudImage Src="@($"data:image/jpeg;base64,{imageDAO.BASE64}")" Fluid="true" Alt="Swedish Farm House" Class="rounded-lg"></MudImage>
+                </ContextMenuTrigger>
+            </MudPaper>
+        }
+    </MudStack>
+    <MudButton OnClick="AddQuestion">添加小问</MudButton>
+    <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-6">
+        @foreach (var questionDAO in Info.GeoProblemDAO.Questions)
+        {   
+            <MudTabPanel Text="小问">
+                <MudTextField AutoGrow Lines="1" T="string" Variant="Variant.Outlined"
+                @bind-Value="questionDAO.Question" />
+                <MudButton OnClick="()=>AddAnswer(questionDAO)">添加答案</MudButton>
+                <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-6">
+                    @foreach (var answerDAO in questionDAO.Answers)
+                    { 
+                        <MudTabPanel Text="答案">
+                            <MudTextField AutoGrow Lines="3" T="string" Variant="Variant.Outlined"
+                            @bind-Value="answerDAO.Answer" />
+                            @foreach (var imageId in answerDAO.AnswerPicIDs)
+                            {
+                                var imageDAO = ic.Find(imageId);
+                                <MudPaper Class="pa-3">
+                                    <ContextMenuTrigger MenuId="myMenu" Data="@imageDAO.Id" WrapperTag="d">
+                                        <MudImage Src="@($"data:image/jpeg;base64,{imageDAO.BASE64}")" Fluid="true" Alt="Swedish Farm House" Class="rounded-lg"></MudImage>
+                                    </ContextMenuTrigger>
+                                </MudPaper>
+                            }
+                        </MudTabPanel>
+                    }
+                </MudTabs>
+            </MudTabPanel>
+        }
+    </MudTabs>
+    <MudButton OnClick="Save">保存</MudButton>
+    <MudButton OnClick="SaveAndAddNext">保存并添加新题目</MudButton>
+</MudForm>
+@code {
+    GeoProblemInfo Info{ get; set; }
+    [Parameter]
+    public string id { get; set; }
+    [Parameter]
+    public string collectionName { get; set; }
+    async Task AddImage(InputFileChangeEventArgs e,string target)
+    {
+        string Base64Image = string.Empty;
+
+        var file = e.File;
+
+        if (file != null)
+        {
+            // 读取上传的文件为流
+            var stream = file.OpenReadStream(10*1024*1024);
+            var memoryStream = new MemoryStream();
+
+            // 将文件流复制到内存流
+            await stream.CopyToAsync(memoryStream);
+            memoryStream.Position = 0;
+
+            // 使用 ImageSharp 处理图像
+            using var image = await SixLabors.ImageSharp.Image.LoadAsync(memoryStream);
+
+            // // 可选：对图像进行处理（例如调整大小）
+            // image.Mutate(x => x.Resize(new ResizeOptions
+            //     {
+            //         Mode = SixLabors.ImageSharp.ResizeMode.Max,
+            //         Size = new Size(800, 800) // 限制最大宽高为 800px
+            //     }));
+
+            // 将图像保存到内存流中
+            using var outputStream = new MemoryStream();
+            await image.SaveAsPngAsync(outputStream); // 保存为 PNG 格式
+            outputStream.Position = 0;
+
+            // 转换为 Base64 字符串
+            Base64Image = Convert.ToBase64String(outputStream.ToArray());
+            imagePreview = Base64Image;
+            stream.Dispose();
+            memoryStream.Dispose();
+        }
+
+
+
+        ImageDAO imageDAO = new ImageDAO();
+        imageDAO.BASE64 = Base64Image;
+        var id = ic.Insert(imageDAO);
+        if (target == nameof(Info.GeoProblemDAO.OrgPictureIDs))
+            Info.GeoProblemDAO.OrgPictureIDs.Add(id);
+        else if (target == nameof(Info.GeoProblemDAO.ProblemPictureIDs))
+            Info.GeoProblemDAO.ProblemPictureIDs.Add(id);
+        gc.Update(Info.GeoProblemDAO);
+        Snackbar.Add("这是一个通知信息！", Severity.Normal);
+        this.StateHasChanged();
+        
+    }
+    void DelImage(ItemClickEventArgs e)
+    {
+        var pid=(string) e.Data;
+        Info.GeoProblemDAO.ProblemPictureIDs.Remove(pid);
+        Info.GeoProblemDAO.OrgPictureIDs.Remove(pid);
+        gc.Update(Info.GeoProblemDAO);
+        ic.Delete(pid);
+    }
+    // 将Image对象转换为Base64字符串
+    static string ImageToBase64(System.Drawing.Image image)
+    {
+        using (MemoryStream ms = new MemoryStream())
+        {
+            image.Save(ms, ImageFormat.Jpeg); // 保存为JPEG格式
+            byte[] imageBytes = ms.ToArray();
+            return Convert.ToBase64String(imageBytes);
+        }
+    }
+    // 从Base64字符串加载图片
+    static System.Drawing.Image Base64ToImage(string base64String)
+    {
+        byte[] imageBytes = Convert.FromBase64String(base64String);
+        using (MemoryStream ms = new MemoryStream(imageBytes))
+        {
+            return System.Drawing.Image.FromStream(ms);
+        }
+    }
+    void RotateImage(ItemClickEventArgs e)
+    {
+        var pid = (string)e.Data;
+        var imageDAO= ic.Find(pid);
+
+        // 2. 从Base64字符串加载图片
+        System.Drawing.Image image = Base64ToImage(imageDAO.BASE64);
+        // 3. 旋转图片（例如：旋转90度）
+        image.RotateFlip(RotateFlipType.Rotate90FlipNone);
+        // 4. 将旋转后的图片转换为Base64字符串
+        imageDAO.BASE64 = ImageToBase64(image);
+        ic.Update(imageDAO);
+        this.StateHasChanged();
+
+    }
+    void RRotateImage(ItemClickEventArgs e)
+    {
+        var pid = (string)e.Data;
+        var imageDAO = ic.Find(pid);
+
+        // 2. 从Base64字符串加载图片
+        System.Drawing.Image image = Base64ToImage(imageDAO.BASE64);
+        // 3. 旋转图片（例如：旋转90度）
+        image.RotateFlip(RotateFlipType.Rotate270FlipNone);
+        // 4. 将旋转后的图片转换为Base64字符串
+        imageDAO.BASE64 = ImageToBase64(image);
+        ic.Update(imageDAO);
+        this.StateHasChanged();
+    }
+
+    void AddQuestion()
+    {
+        Info.GeoProblemDAO.Questions.Add(new GeoQuestionDAO());
+    }
+    void AddAnswer(GeoQuestionDAO geoQuestionDAO)
+    {
+        geoQuestionDAO.Answers.Add(new GeoAnswerDAO());
+    }
+    private string? imagePreview; // 用于存储Base64格式的图片
+                                  // 当用户选择图片时触发
+    private async Task OnInputFileChange(InputFileChangeEventArgs e)
+    {
+        
+    }
+    GeoProblemCollection gc;
+    ImageCollection ic;
+    InferenceInputCollection iic;
+    InferenceOutputCollection ioc;
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        gc = GeoProblemCollection.Get(collectionName);
+        ic = ImageCollection.Get(collectionName);
+        iic = InferenceInputCollection.Get(collectionName);
+        ioc = InferenceOutputCollection.Get(collectionName);
+        Info = new GeoProblemInfo();
+        Info.GeoProblemDAO = gc.Find(id);
+    }
+
+    public void BackToManage(){
+        NavigationManager.NavigateTo($"/");
+    }
+    public void Save()
+    {
+        gc.Update(Info.GeoProblemDAO);
+    }
+    public void SaveAndAddNext()
+    {
+        gc.Update(Info.GeoProblemDAO);
+
+        GeoProblemDAO problemDAO = new GeoProblemDAO();
+        problemDAO.Title = "未命名";
+        gc.Insert(problemDAO);
+
+        var inputDAO = new InferenceInputDAO();
+        inputDAO.ProblemID = problemDAO.Id;
+        iic.Insert(inputDAO);
+
+        var outputDAO = new InferenceOutputDAO();
+        outputDAO.ProblemID = problemDAO.Id;
+        ioc.Insert(outputDAO);
+
+        NavigationManager.NavigateTo($"/ProblemEdit/{gc.Config.CollectionName}/{problemDAO.Id}");
+    }
+    void OnClick(ItemClickEventArgs e)
+    {
+        Console.WriteLine($"Item Clicked => Menu: {e.ContextMenuId}, MenuTarget: {e.ContextMenuTargetId}, IsCanceled: {e.IsCanceled}, MenuItem: {e.MenuItemElement}, MouseEvent: {e.MouseEvent}");
+    }
+}

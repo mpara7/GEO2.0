@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>library</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+	
+	<ItemGroup>
+		<PackageReference Include="Google.Protobuf" Version="3.28.2" />
+		<PackageReference Include="Grpc.Core" Version="2.46.3" />
+		<PackageReference Include="Grpc.Core.Api" Version="2.46.3" />
+		<PackageReference Include="Grpc.Tools" Version="2.48.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="GrpcDotNetNamedPipes" Version="1.4.4" />
+		<PackageReference Include="YamlDotNet" Version="16.1.3" />
+	</ItemGroup>
+	
+	<ItemGroup>
+	  <ProjectReference Include="..\..\..\GeoInferenceEngine\GeoInferenceEngine.Backbone\GeoInferenceEngine.Backbone.csproj" />
+	  <ProjectReference Include="..\..\..\GeoInferenceEngine\GeoInferenceEngine.EquivalencePlaneGeometry\GeoInferenceEngine.EquivalencePlaneGeometry.csproj" />
+	  <ProjectReference Include="..\..\..\GeoInferenceEngine\GeoInferenceEngine.PredicateShared\GeoInferenceEngine.PredicateShared.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+		<Protobuf Include="Protos\GeoInferenceEngine.proto" GrpcServices="Client" />
+	</ItemGroup>
+</Project>

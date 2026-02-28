@@ -1,0 +1,218 @@
+﻿
+@page "/ProblemDatabaseManage"
+@using System.IO;
+@using System.IO.Compression
+@using Newtonsoft.Json;
+@using MongoDB.Bson;
+@using MongoDB.Driver;
+@using  GeoProblemDatabases.Models;
+@using GeoProblemDatabases.Collections;
+@inject IDialogService DialogService
+@inject IJSRuntime JSRuntime
+@inject GeoProblemDatabases.Databases.GeoProblemDatabase gdb
+@inject GeoProblemDatabases.Databases.ImageDatabase idb
+@inject GeoProblemDatabases.Databases.InferenceInputDatabase iidb
+@inject GeoProblemDatabases.Databases.InferenceOutputDatabase iodb
+@using MongoDB.Bson.Serialization;
+
+<MudPaper Style="width: 80%;" class="my-paper">
+    <MudText Typo="Typo.h3" Style="margin: 50px auto 0 ">题目库列表</MudText>
+    <MudStack Row="true">
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="RefreshCollectionNames">刷新题目库</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="AddCollection">添加题目库</MudButton>
+        <MudTextField @bind-Value="NewCollectionName" Label="此处输入新题目库名称"></MudTextField>
+    </MudStack>
+   
+    <MudList T="string">
+        @foreach (var name in collectionNames)
+        {
+            <MudStack Row="true">
+                <MudListItem>@name</MudListItem>
+                <MudButton Variant="Variant.Filled" Color="Color.Surface"
+                           OnClick="()=>ClearCollection(name)">清空</MudButton>
+                <MudButton Variant="Variant.Filled" Color="Color.Error"
+                           OnClick="()=>DropCollection(name)">删除</MudButton>
+            </MudStack>
+        }
+    </MudList>
+    <MudButton style="margin: 50px auto 0" Variant="Variant.Filled" Color="Color.Primary"
+               OnClick="()=>{SaveFile();RefreshFiles();}">题目库存档</MudButton>
+    
+    <MudList T="string">
+        @foreach (var name in fileDirectories)
+        {
+            <MudStack Row="true">
+                <MudListItem>@name</MudListItem>
+                <MudButton Variant="Variant.Filled" Color="Color.Surface"
+                           OnClick="@(()=>{RecoverFile(name);})">还原</MudButton>
+                <MudButton Variant="Variant.Filled" Color="Color.Error"
+                           OnClick="@(()=>{DelFile($"wwwroot/files/{name}");RefreshFiles();})">删除</MudButton>
+                <a href="files/@(name).zip" style="width:30px" download>下载</a>
+            </MudStack>
+        }
+    </MudList>
+</MudPaper>
+
+@code {
+    
+
+    public string NewCollectionName { get; set; } = null;
+    List<string> collectionNames = new List<string>() {};
+    #region 文件存档管理
+    List<string> fileDirectories = new List<string>() { };
+    public void RefreshFiles()
+    {
+        fileDirectories = Directory.GetDirectories("wwwroot\\files").Select(path=>path.Replace("wwwroot\\files\\","")).ToList();
+    }
+    public void RecoverFile(string path)
+    {
+        string[] files = Directory.GetFiles($"wwwroot\\files\\{path}\\GeoProblem\\");
+        foreach (var filePath in files)
+        {
+            var jsonData = File.ReadAllText(filePath);
+            string fileName = Path.GetFileNameWithoutExtension(filePath);
+            // 将 JSON 数据转换为 BsonDocument
+            var document = BsonSerializer.Deserialize<List<GeoProblemDAO>>(jsonData);
+            gdb.Clear(fileName);
+            var gc= GeoProblemCollection.Get(fileName);
+            foreach (var insert in document)
+            {
+                gc.Insert(insert);
+            }
+        }
+        
+        files = Directory.GetFiles($"wwwroot\\files\\{path}\\Image\\");
+        foreach (var filePath in files)
+        {
+            var jsonData = File.ReadAllText(filePath);
+            string fileName = Path.GetFileNameWithoutExtension(filePath);
+            // 将 JSON 数据转换为 BsonDocument
+            var document = BsonSerializer.Deserialize<List<ImageDAO>>(jsonData);
+            idb.Clear(fileName);
+            var gc= ImageCollection.Get(fileName);
+            foreach (var insert in document)
+            {
+                gc.Insert(insert);
+            }
+        }
+        files = Directory.GetFiles($"wwwroot\\files\\{path}\\InferenceInput\\");
+        foreach (var filePath in files)
+        {
+            var jsonData = File.ReadAllText(filePath);
+            string fileName = Path.GetFileNameWithoutExtension(filePath);
+            // 将 JSON 数据转换为 BsonDocument
+            var document = BsonSerializer.Deserialize<List<InferenceInputDAO>>(jsonData);
+            iidb.Clear(fileName);
+            var gc = InferenceInputCollection.Get(fileName);
+            foreach (var insert in document)
+            {
+                gc.Insert(insert);
+            }
+        }
+
+        files = Directory.GetFiles($"wwwroot\\files\\{path}\\InferenceOutput\\");
+        foreach (var filePath in files)
+        {
+            var jsonData = File.ReadAllText(filePath);
+            string fileName = Path.GetFileNameWithoutExtension(filePath);
+            // 将 JSON 数据转换为 BsonDocument
+            var document = BsonSerializer.Deserialize<List<InferenceOutputDAO>>(jsonData);
+            iodb.Clear(fileName);
+            var gc = InferenceOutputCollection.Get(fileName);
+            foreach (var insert in document)
+            {
+                gc.Insert(insert);
+            }
+        }
+    }
+    public void DelFile(string path)
+    {
+        string[] files = Directory.GetFiles(path);
+        string[] dirs = Directory.GetDirectories(path);
+
+        foreach (string file in files)
+        {
+            File.SetAttributes(file, FileAttributes.Normal);
+            File.Delete(file);
+        }
+
+        foreach (string dir in dirs)
+        {
+            DelFile(dir);
+        }
+
+        Directory.Delete(path, true);
+        try
+        {
+            File.Delete(path + ".zip");
+        }
+        catch
+        {
+
+        }
+
+    }
+    public void SaveFile()
+    {
+        string directoryName = DateTime.Now.ToString("yyyyMMddHHmmss");
+        MongoDbExporter.ExportCollectionsToJson(directoryName);
+        var dir = "wwwroot/files";
+        File.Delete(directoryName + ".zip");
+        ZipFile.CreateFromDirectory($"{dir}\\{directoryName}", 
+        $"wwwroot\\files\\{directoryName}.zip", CompressionLevel.Optimal, true);
+        RefreshCollectionNames();
+    }
+    #endregion
+
+    public void RefreshCollectionNames()
+    {
+        collectionNames = new(gdb.GetCollectionNames());
+    }
+    protected override void OnParametersSet()
+    {
+        RefreshCollectionNames();
+        RefreshFiles();
+        base.OnParametersSet();
+    }
+    #region  数据库管理
+    public void AddCollection()
+    {
+        if (NewCollectionName != null)
+        {
+            gdb.Create(NewCollectionName);
+            idb.Create(NewCollectionName);
+            iidb.Create(NewCollectionName);
+            iodb.Create(NewCollectionName);
+            RefreshCollectionNames();
+        }
+    }
+    public void ClearCollection(string collectionName)
+    {
+        if (collectionName != null)
+        {
+            
+            gdb.Drop(collectionName);
+            idb.Drop(collectionName);
+            iidb.Drop(collectionName);
+            iodb.Drop(collectionName);
+            gdb.Create(collectionName);
+            idb.Create(collectionName);
+            iidb.Create(collectionName);
+            iodb.Create(collectionName);
+            RefreshCollectionNames();
+        }
+    }
+    public void DropCollection(string collectionName)
+    {
+        if (collectionName != null)
+        {
+            gdb.Drop(collectionName);
+            idb.Drop(collectionName);
+            iidb.Drop(collectionName);
+            iodb.Drop(collectionName);
+            RefreshCollectionNames();
+        }
+    }
+    #endregion
+    
+}

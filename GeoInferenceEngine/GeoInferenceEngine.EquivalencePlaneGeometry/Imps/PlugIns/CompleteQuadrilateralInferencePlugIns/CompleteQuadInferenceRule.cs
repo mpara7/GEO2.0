@@ -23,7 +23,8 @@ namespace GeoInferenceEngine.EquivalencePlaneGeometry.Imps.PlugIns.CompleteQuadr
             Line line2_1 = (Line)lineIntersectionPoint2.Properties[1];
             Line line2_2 = (Line)lineIntersectionPoint2.Properties[2];
 
-            //
+            // 【新增防御 1】：确保这 4 条线是 4 条截然不同的线！不能有重合。
+            if (line1_1 == line2_1 || line1_1 == line2_2 || line1_2 == line2_1 || line1_2 == line2_2) return;
 
             var points1_1 = new HashSet<Point>(line1_1.Points);
             var points1_2 = new HashSet<Point>(line1_2.Points);
@@ -52,6 +53,11 @@ namespace GeoInferenceEngine.EquivalencePlaneGeometry.Imps.PlugIns.CompleteQuadr
             Point p3 = (Point)lineinsert1[1];
             Point p4 = (Point)lineinsert2[0];
             Point p6 = (Point)lineinsert2[1];
+
+            // 【新增防御 2（核心）】：完全四边形的 6 个顶点必须完全不同！
+            // 只要有任何两个点重合，说明必定发生了“三线共点”，立刻抛弃！
+            var uniquePoints = new HashSet<Point> { p1, p2, p3, p4, p5, p6 };
+            if (uniquePoints.Count != 6) return;
 
             //判断1 2 4是否共线，不共线就把4和6换位置
             if (!(KnowledgeGetter.HasColine(p1, p2, p4)))
@@ -579,7 +585,7 @@ namespace GeoInferenceEngine.EquivalencePlaneGeometry.Imps.PlugIns.CompleteQuadr
         //       && eq2.Properties[0].Properties[2].ToString().Equals("D"))
         //        {
 
-        //GeoEquation equation1 = new GeoEquation(1, 1);
+        //            GeoEquation equation1 = new GeoEquation(1, 1);
         //            Segment AF = KnowledgeGetter.GetSegment((Point)eq1.Properties[0].Properties[0], (Point)eq1.Properties[2].Properties[1]);
         //            Segment FB = KnowledgeGetter.GetSegment((Point)eq1.Properties[2].Properties[1], (Point)eq2.Properties[0].Properties[1]);
         //            Segment BD = KnowledgeGetter.GetSegment((Point)eq2.Properties[0].Properties[1], (Point)eq2.Properties[0].Properties[2]);

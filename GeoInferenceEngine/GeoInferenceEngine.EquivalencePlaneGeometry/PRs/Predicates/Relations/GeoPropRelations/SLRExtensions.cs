@@ -74,6 +74,7 @@ namespace GeoInferenceEngine.EquivalencePlaneGeometry.PRs.Predicates.Relations.G
             // 5. 生成新的 SREE
             var newSREE = new SREE(newExpr, factors.ToArray());
             newSREE.AddCondition("贪心消元合并", eq1, eq2);
+           
             return newSREE;
         }
     }
@@ -141,7 +142,7 @@ namespace GeoInferenceEngine.EquivalencePlaneGeometry.PRs.Predicates.Relations.G
             // 3. 构建等式 (左右两边都经过系统的自带化简)
             Expr rightPart = sree.Expr.Clone();
             var equation = new GeoEquation(leftPart.Simplify(), rightPart.Simplify());
-
+            
             return equation;
         }
     }

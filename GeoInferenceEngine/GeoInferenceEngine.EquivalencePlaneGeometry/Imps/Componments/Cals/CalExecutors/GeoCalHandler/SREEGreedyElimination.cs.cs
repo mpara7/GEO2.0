@@ -90,10 +90,11 @@ namespace GeoInferenceEngine.EquivalencePlaneGeometry.Imps.Componments.Cal.CalEx
                     // ================== 核心新增 ==================
                     // 2. 将化简后的结果转换为系统原生代数等式，并交给代数引擎！
                     GeoEquation geoEq = combinedEq.ToGeoEquation();
-                    geoEq.Reason = "由SREE贪心消元等价转换得出";
+                    geoEq.AddCondition("消元", pivotEq, targetEq);
 
                     // 将新等式加入系统的代数计算池，供高斯消元等后续模块使用
-                    _calAddProcessor.Add(geoEq);
+                    //_calAddProcessor.Add(geoEq);
+                    _knowledgeAddProcessor.Add(geoEq);
                     // ==============================================
 
                     systemChanged = true;

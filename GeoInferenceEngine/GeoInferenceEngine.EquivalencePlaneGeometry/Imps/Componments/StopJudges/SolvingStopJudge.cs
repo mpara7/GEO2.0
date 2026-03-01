@@ -12,6 +12,10 @@ namespace GeoInferenceEngine.EquivalencePlaneGeometry.Imps.Componments.StopJudge
         KnowledgeBase knowledgeBase;
         [ZDI]
         TargetBase targetBase;
+
+        // 【核心新增】注入代数方程库，停机判断器必须查这里才知道等式有没有证出来
+        [ZDI]
+        public FormularBase formularBase { get; set; }
         internal override void Init()
         {
             if (targetBase.ToSolves.Count == 0 && targetBase.ToProves.Count == 0)
@@ -79,7 +83,41 @@ namespace GeoInferenceEngine.EquivalencePlaneGeometry.Imps.Componments.StopJudge
                     }
                 }
             }
+            // ================= 2. 【核心修复：检查等式证明目标】 =================
+            if (formularBase != null)
+            {
+                foreach (var unProvedEq in targetBase.EquationTargetInfos.Where(i => !i.IsSuccess).ToList())
+                {
+                    // 方法 A：优先使用 HashCode 精确匹配 (左边右边结构完全一致)
+                    if (formularBase.AllGeoEquationInfos.ContainsKey(unProvedEq.Target.HashCode))
+                    {
+                        unProvedEq.IsSuccess = true;
+                        unProvedEq.Conclusion = formularBase.AllGeoEquationInfos[unProvedEq.Target.HashCode].GeoEquation;
+                        AppInfo.IsActivedStop = true;
+                    }
+                    else
+                    {
+                        // 方法 B：退源匹配防漏网。
+                        // 如果输入的证明是 1 = X/Y，推导出的是 X/Y = 1，HashCode 会不一样，这里做交叉防漏判定
+                        foreach (var sysEqInfo in formularBase.DistanceMultiplicationGeoEquationInfos.Values)
+                        {
+                            bool isMatch =
+                                sysEqInfo.GeoEquation.ToString() == unProvedEq.Target.ToString() ||
+                                (sysEqInfo.GeoEquation.LeftPart.ToString() == unProvedEq.Target.RightPart.ToString() &&
+                                 sysEqInfo.GeoEquation.RightPart.ToString() == unProvedEq.Target.LeftPart.ToString());
 
+                            if (isMatch)
+                            {
+                                unProvedEq.IsSuccess = true;
+                                unProvedEq.Conclusion = sysEqInfo.GeoEquation;
+                                AppInfo.IsActivedStop = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            // =================================================================
             var allSolved = targetBase.ToProves.All(p => p.IsSuccess) && targetBase.ToSolves.All(p => p.IsSuccess);
             var finish = allSolved || EngineInfo.IsOutOfPair && !EngineInfo.HasNewKnowledge && !EngineInfo.HasNewEquation;
             if (finish)

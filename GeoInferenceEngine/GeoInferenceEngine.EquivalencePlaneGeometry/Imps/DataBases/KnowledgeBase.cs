@@ -49,6 +49,19 @@ namespace GeoInferenceEngine.EquivalencePlaneGeometry.Imps.DataBases
 
 
         #region 获取几何对象
+
+        /// <summary>
+        /// 泛型获取某类型的所有知识对象 (二次开发补充)
+        /// </summary>
+        public List<T> GetKnowledgesByType<T>() where T : Knowledge
+        {
+            if (Categories.ContainsKey(typeof(T)))
+            {
+                // 将 List<Knowledge> 强转为指定的子类 List<T>
+                return Categories[typeof(T)].Cast<T>().ToList();
+            }
+            return new List<T>();
+        }
         public virtual bool HasSegment(Knowledge p1, Knowledge p2)
         {
             Segment segment = new Segment((Point)p1, (Point)p2);

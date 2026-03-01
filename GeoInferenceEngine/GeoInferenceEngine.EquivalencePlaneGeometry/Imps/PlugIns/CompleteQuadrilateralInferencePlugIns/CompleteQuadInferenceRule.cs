@@ -560,6 +560,175 @@ namespace GeoInferenceEngine.EquivalencePlaneGeometry.Imps.PlugIns.CompleteQuadr
 
         }
 
+        //public void 比例式计算(SREE eq1, SREE eq2)
+        //{
+
+        //    if (eq1.count != 3 || eq2.count != 3) return; //避免等式太长导致无限循环
+        //    if (eq1.Expr != 1 || eq2.Expr != 1) return;
+        //    if (eq1.count >= 5 || eq2.count >= 5) return; //避免等式太长导致无限循环
+        //    if (eq1.count == 0 || eq2.count == 0) return;
+        //    if (eq1.count < 3 || eq2.count < 3) return;
+        //    int index1 = 0;
+        //    int index2 = 0;
+        //    bool flag = false;
+
+        //    if (eq1.Properties[0].Properties[0].ToString().Equals("A")
+        //        && eq1.Properties[0].Properties[2].ToString().Equals("D"))
+        //    {
+        //        if (eq2.Properties[0].Properties[0].ToString().Equals("C")
+        //       && eq2.Properties[0].Properties[2].ToString().Equals("D"))
+        //        {
+
+        //            GeoEquation equation1 = new GeoEquation(1, 1);
+        //            Segment AF = KnowledgeGetter.GetSegment((Point)eq1.Properties[0].Properties[0], (Point)eq1.Properties[2].Properties[1]);
+        //            Segment FB = KnowledgeGetter.GetSegment((Point)eq1.Properties[2].Properties[1], (Point)eq2.Properties[0].Properties[1]);
+        //            Segment BD = KnowledgeGetter.GetSegment((Point)eq2.Properties[0].Properties[1], (Point)eq2.Properties[0].Properties[2]);
+        //            Segment CD = KnowledgeGetter.GetSegment((Point)eq2.Properties[0].Properties[0], (Point)eq2.Properties[0].Properties[2]);
+        //            Segment CE = KnowledgeGetter.GetSegment((Point)eq2.Properties[0].Properties[0], (Point)eq2.Properties[2].Properties[1]);
+        //            Segment EA = KnowledgeGetter.GetSegment((Point)eq2.Properties[2].Properties[1], (Point)eq1.Properties[0].Properties[0]);
+        //            var equation2 = new GeoEquation(AF.Length / FB.Length, 1);
+        //            var equation3 = new GeoEquation(BD.Length / CD.Length, 1);
+        //            var equation4 = new GeoEquation(CE.Length / EA.Length, 1);
+        //            equation1 = equation1.Mul(equation2);
+        //            equation1 = equation1.Mul(equation3);
+        //            equation1 = equation1.Mul(equation4);
+        //            equation1.AddCondition(eq1, eq2);
+        //            equation1.AddReason();
+        //            AddProcessor.Add(equation1);
+        //            return;
+
+        //        }
+        //    }
+        //    List<SLR> commonSegment = new List<SLR>();
+        //    List<SLR> commonSegmentInvert = new List<SLR>();
+        //    SREE eq1invert = null;
+        //    // 找到两个 SegmentRatioEquation 中相同的 SegmentLengthRatio
+        //    foreach (var segment1 in eq1.Properties)
+        //    {
+        //        index1++;
+        //        foreach (var segment2 in eq2.Properties)
+        //        {
+        //            index2++;
+        //            // 判断两个 SegmentLengthRatio 是否相等,这里是以线段比较
+        //            if (segment1.Properties[1] == segment2.Properties[1])
+        //            {
+        //                if (segment1.Properties[0] == segment2.Properties[0] || segment1.Properties[0] == segment2.Properties[2])
+        //                {
+        //                    if (segment1.Properties[2] == segment2.Properties[0] || segment1.Properties[2] == segment2.Properties[2])
+        //                    {
+        //                        //以eq1为正
+        //                        commonSegment.Add((SLR)segment1);
+        //                        var expr = segment1.Expr.Clone();
+        //                        if (segment1.Expr != 1)
+        //                        {
+        //                            expr = segment1.Expr.Invert().Clone();
+
+        //                        }
+        //                        SLR segmentLengthRatio = new SLR((Point)segment1.Properties[2], (Point)segment1.Properties[1], (Point)segment1.Properties[0], expr);
+        //                        commonSegmentInvert.Add(segmentLengthRatio);
+        //                        flag = true;
+        //                        continue;
+        //                    }
+
+        //                }
+
+        //            }
+        //        }
+        //    }
+
+        //    //判断是否相反
+        //    if (flag)
+        //    {
+        //        List<SLR> invertedSegments = new List<SLR>();
+        //        List<SLR> zhengfan = new List<SLR>();
+        //        bool zheng = false;
+        //        foreach (var segment in eq2.Properties)
+        //        {
+        //            foreach (var segment2 in commonSegment)
+        //            {
+        //                if (segment == segment2)
+        //                {
+        //                    zheng = true;
+        //                    break;
+        //                }
+        //            }
+        //        }
+        //        foreach (var segment in eq1.Properties)
+        //        {
+        //            if (!commonSegment.Any(s => s.Properties[1] == segment.Properties[1] && s.Properties[0] == segment.Properties[0]
+        //            && s.Properties[2] == segment.Properties[2]))
+        //            {
+        //                if (!commonSegmentInvert.Any(s => s.Properties[1] == segment.Properties[1] && s.Properties[0] == segment.Properties[0]
+        //            && s.Properties[2] == segment.Properties[2]))
+        //                {
+        //                    invertedSegments.Add((SLR)segment);
+
+        //                }
+        //            }
+        //        }
+        //        // 遍历 eq2.Properties，将不等于 commonSegment 的部分添加到 eq1invert
+        //        foreach (var segment in eq2.Properties)
+        //        {
+
+
+        //            //判断eq2是正还是反，正要倒，反不用倒
+        //            if (!commonSegment.Any(s => s.Properties[1] == segment.Properties[1] && s.Properties[0] == segment.Properties[0]
+        //            && s.Properties[2] == segment.Properties[2]))
+        //            {
+        //                //这是不等于正的
+        //                if (!commonSegmentInvert.Any(s => s.Properties[1] == segment.Properties[1] && s.Properties[0] == segment.Properties[0]
+        //            && s.Properties[2] == segment.Properties[2]))
+        //                {
+        //                    if (zheng)
+        //                    {
+        //                        SLR segmentLengthRatio = new SLR((Point)segment.Properties[2], (Point)segment.Properties[1], (Point)segment.Properties[0], segment.Expr.Invert());
+        //                        invertedSegments.Add(segmentLengthRatio);
+        //                    }
+        //                    else
+        //                    {
+        //                        SLR segmentLengthRatio = new SLR((Point)segment.Properties[0], (Point)segment.Properties[1], (Point)segment.Properties[2], segment.Expr.Invert());
+        //                        invertedSegments.Add(segmentLengthRatio);
+        //                    }
+
+        //                }
+        //            }
+        //        }
+
+        //        //进行替换
+
+
+
+
+        //        if (invertedSegments.Count == 0 || invertedSegments.Count >= 5) return;
+        //        //GeoEquation equation1 = new GeoEquation(1, 1);
+
+
+        //        //foreach (var item in invertedSegments)
+        //        //{
+
+        //        //    Segment seg1 = KnowledgeGetter.GetSegment((Point)item.Properties[0], (Point)item.Properties[1]);
+        //        //    Segment seg2 = KnowledgeGetter.GetSegment((Point)item.Properties[1], (Point)item.Properties[2]);
+        //        //    var equation2 = new GeoEquation(seg1.Length / seg2.Length, 1);
+        //        //    equation1 = equation1.Mul(equation2);
+        //        //}
+
+        //        //equation1.AddCondition(eq1, eq2);
+        //        //equation1.AddReason();
+        //        //AddProcessor.Add(equation1);
+        //        SREE sreInstance = new SREE(eq1.Expr, invertedSegments.ToArray());
+        //        sreInstance.AddReason();
+        //        sreInstance.AddCondition(eq1, eq2);
+        //        AddProcessor.Add(sreInstance);
+
+        //    }
+        //    else
+        //    {
+        //        return;
+        //    }
+
+        //}
+
+
         //public void Cal(SREE equation1, SLR segmentLengthRatio1, SLR segmentLengthRatio2)
         //{
         //    //算比值的
@@ -989,177 +1158,11 @@ namespace GeoInferenceEngine.EquivalencePlaneGeometry.Imps.PlugIns.CompleteQuadr
 
         //}
 
-        public void 比例式计算(SREE eq1, SREE eq2)
-        {
 
-            if (eq1.count != 3 || eq2.count != 3) return; //避免等式太长导致无限循环
-            if (eq1.Expr != 1 || eq2.Expr != 1) return;
-            if (eq1.count >= 5 || eq2.count >= 5) return; //避免等式太长导致无限循环
-            if (eq1.count == 0 || eq2.count == 0) return;
-            if (eq1.count < 3 || eq2.count < 3) return;
-            int index1 = 0;
-            int index2 = 0;
-            bool flag = false;
-
-            if (eq1.Properties[0].Properties[0].ToString().Equals("A")
-                && eq1.Properties[0].Properties[2].ToString().Equals("D"))
-            {
-                if (eq2.Properties[0].Properties[0].ToString().Equals("C")
-               && eq2.Properties[0].Properties[2].ToString().Equals("D"))
-                {
-                
-                    GeoEquation equation1 = new GeoEquation(1, 1);
-                    Segment AF = KnowledgeGetter.GetSegment((Point)eq1.Properties[0].Properties[0], (Point)eq1.Properties[2].Properties[1]);
-                    Segment FB = KnowledgeGetter.GetSegment((Point)eq1.Properties[2].Properties[1], (Point)eq2.Properties[0].Properties[1]);
-                    Segment BD = KnowledgeGetter.GetSegment((Point)eq2.Properties[0].Properties[1], (Point)eq2.Properties[0].Properties[2]);
-                    Segment CD = KnowledgeGetter.GetSegment((Point)eq2.Properties[0].Properties[0], (Point)eq2.Properties[0].Properties[2]);
-                    Segment CE = KnowledgeGetter.GetSegment((Point)eq2.Properties[0].Properties[0], (Point)eq2.Properties[2].Properties[1]);
-                    Segment EA = KnowledgeGetter.GetSegment((Point)eq2.Properties[2].Properties[1], (Point)eq1.Properties[0].Properties[0]);
-                    var equation2 = new GeoEquation(AF.Length / FB.Length, 1);
-                    var equation3 = new GeoEquation(BD.Length / CD.Length, 1);
-                    var equation4 = new GeoEquation(CE.Length / EA.Length, 1);
-                    equation1 = equation1.Mul(equation2);
-                    equation1 = equation1.Mul(equation3);
-                    equation1 = equation1.Mul(equation4);
-                    equation1.AddCondition(eq1, eq2);
-                    equation1.AddReason();
-                    AddProcessor.Add(equation1);
-                    return;
-
-                }
-            }
-            List<SLR> commonSegment = new List<SLR>();
-            List<SLR> commonSegmentInvert = new List<SLR>();
-            SREE eq1invert = null;
-            // 找到两个 SegmentRatioEquation 中相同的 SegmentLengthRatio
-            foreach (var segment1 in eq1.Properties)
-            {
-                index1++;
-                foreach (var segment2 in eq2.Properties)
-                {
-                    index2++;
-                    // 判断两个 SegmentLengthRatio 是否相等,这里是以线段比较
-                    if (segment1.Properties[1] == segment2.Properties[1])
-                    {
-                        if (segment1.Properties[0] == segment2.Properties[0] || segment1.Properties[0] == segment2.Properties[2])
-                        {
-                            if (segment1.Properties[2] == segment2.Properties[0] || segment1.Properties[2] == segment2.Properties[2])
-                            {
-                                //以eq1为正
-                                commonSegment.Add((SLR)segment1);
-                                var expr = segment1.Expr.Clone();
-                                if (segment1.Expr != 1)
-                                {
-                                    expr = segment1.Expr.Invert().Clone();
-
-                                }
-                                SLR segmentLengthRatio = new SLR((Point)segment1.Properties[2], (Point)segment1.Properties[1], (Point)segment1.Properties[0], expr);
-                                commonSegmentInvert.Add(segmentLengthRatio);
-                                flag = true;
-                                continue;
-                            }
-
-                        }
-
-                    }
-                }
-            }
-            
-            //判断是否相反
-            if (flag)
-            {
-                List<SLR> invertedSegments = new List<SLR>();
-                List<SLR> zhengfan = new List<SLR>();
-                bool zheng = false;
-                foreach (var segment in eq2.Properties)
-                {
-                    foreach (var segment2 in commonSegment)
-                    {
-                        if (segment == segment2)
-                        {
-                            zheng = true;
-                            break;
-                        }
-                    }
-                }
-                foreach (var segment in eq1.Properties)
-                {
-                    if (!commonSegment.Any(s => s.Properties[1] == segment.Properties[1] && s.Properties[0] == segment.Properties[0]
-                    && s.Properties[2] == segment.Properties[2]))
-                    {
-                        if (!commonSegmentInvert.Any(s => s.Properties[1] == segment.Properties[1] && s.Properties[0] == segment.Properties[0]
-                    && s.Properties[2] == segment.Properties[2]))
-                        {
-                            invertedSegments.Add((SLR)segment);
-
-                        }
-                    }
-                }
-                // 遍历 eq2.Properties，将不等于 commonSegment 的部分添加到 eq1invert
-                foreach (var segment in eq2.Properties)
-                {
-
-
-                    //判断eq2是正还是反，正要倒，反不用倒
-                    if (!commonSegment.Any(s => s.Properties[1] == segment.Properties[1] && s.Properties[0] == segment.Properties[0]
-                    && s.Properties[2] == segment.Properties[2]))
-                    {
-                        //这是不等于正的
-                        if (!commonSegmentInvert.Any(s => s.Properties[1] == segment.Properties[1] && s.Properties[0] == segment.Properties[0]
-                    && s.Properties[2] == segment.Properties[2]))
-                        {
-                            if (zheng)
-                            {
-                                SLR segmentLengthRatio = new SLR((Point)segment.Properties[2], (Point)segment.Properties[1], (Point)segment.Properties[0], segment.Expr.Invert());
-                                invertedSegments.Add(segmentLengthRatio);
-                            }
-                            else
-                            {
-                                SLR segmentLengthRatio = new SLR((Point)segment.Properties[0], (Point)segment.Properties[1], (Point)segment.Properties[2], segment.Expr.Invert());
-                                invertedSegments.Add(segmentLengthRatio);
-                            }
-
-                        }
-                    }
-                }
-
-                //进行替换
-
-
-
-
-                if (invertedSegments.Count == 0 || invertedSegments.Count >= 5) return;
-                //GeoEquation equation1 = new GeoEquation(1, 1);
-
-
-                //foreach (var item in invertedSegments)
-                //{
-                 
-                //    Segment seg1 = KnowledgeGetter.GetSegment((Point)item.Properties[0], (Point)item.Properties[1]);
-                //    Segment seg2 = KnowledgeGetter.GetSegment((Point)item.Properties[1], (Point)item.Properties[2]);
-                //    var equation2 = new GeoEquation(seg1.Length / seg2.Length, 1);
-                //    equation1 = equation1.Mul(equation2);
-                //}
-
-                //equation1.AddCondition(eq1, eq2);
-                //equation1.AddReason();
-                //AddProcessor.Add(equation1);
-                SREE sreInstance = new SREE(eq1.Expr, invertedSegments.ToArray());
-                sreInstance.AddReason();
-                sreInstance.AddCondition(eq1, eq2);
-                AddProcessor.Add(sreInstance);
-
-            }
-            else
-            {
-                return;
-            }
-
-        }
 
         //public void MenelausTheoremNi(SREE eq1)
         //{
-            
+
         //    //（1）要先判断这个等式的形式好吧
         //    if (eq1.count != 3) return;
 
@@ -1184,7 +1187,7 @@ namespace GeoInferenceEngine.EquivalencePlaneGeometry.Imps.PlugIns.CompleteQuadr
         //    if (uniquePoints.Count != 6) return;
 
         //    //（3）每条等式是不是都有重复的一个点，拿出来
-          
+
 
         //    uniquePoints.Remove(eq1.SegLR1.point2);
         //    uniquePoints.Remove(eq1.SegLR2.point2);
@@ -1193,7 +1196,7 @@ namespace GeoInferenceEngine.EquivalencePlaneGeometry.Imps.PlugIns.CompleteQuadr
         //    Point p1 = uniquePoints[0];
         //    Point p2 = uniquePoints[1];
         //    Point p3 = uniquePoints[2];
-            
+
 
         //    Point p4 = eq1.SegLR1.point2;
         //    Point p5 = eq1.SegLR2.point2;
@@ -1231,7 +1234,7 @@ namespace GeoInferenceEngine.EquivalencePlaneGeometry.Imps.PlugIns.CompleteQuadr
         //        line3.AddCondition(pred);
         //        AddProcessor.Add(line3);
         //    }
-            
+
 
         //    if (line4 == null)
         //    {

@@ -346,91 +346,91 @@ namespace GeoInferenceEngine.EquivalencePlaneGeometry.Imps.PlugIns.CompleteQuadr
 
         }
 
-        //public void 梅涅劳斯逆定理(SREE eq1)
-        //{
+        public void 梅涅劳斯逆定理(SREE eq1)
+        {
 
-        //    //（1）要先判断这个等式的形式好吧
-        //    if (eq1.count != 3) return;
+            //（1）要先判断这个等式的形式好吧
+            if (eq1.count != 3) return;
 
-        //    //（2）符合条件后，判断一下是不是只有六个点
-        //    List<Point> points = new List<Point>
-        //    {
-        //        eq1.SegLR1.point1,
-        //        eq1.SegLR1.point2,
-        //        eq1.SegLR1.point3,
+            //（2）符合条件后，判断一下是不是只有六个点
+            List<Point> points = new List<Point>
+            {
+                eq1.SegLR1.point1,
+                eq1.SegLR1.point2,
+                eq1.SegLR1.point3,
 
-        //        eq1.SegLR2.point1,
-        //        eq1.SegLR2.point2,
-        //        eq1.SegLR2.point3,
+                eq1.SegLR2.point1,
+                eq1.SegLR2.point2,
+                eq1.SegLR2.point3,
 
-        //        eq1.SegLR3.point1,
-        //        eq1.SegLR3.point2,
-        //        eq1.SegLR3.point3,
-
-
-        //    };
-        //    List<Point> uniquePoints = points.Distinct().ToList();
-        //    if (uniquePoints.Count != 6) return;
-
-        //    //（3）每条等式是不是都有重复的一个点，拿出来
+                eq1.SegLR3.point1,
+                eq1.SegLR3.point2,
+                eq1.SegLR3.point3,
 
 
-        //    uniquePoints.Remove(eq1.SegLR1.point2);
-        //    uniquePoints.Remove(eq1.SegLR2.point2);
-        //    uniquePoints.Remove(eq1.SegLR3.point2);
-        //    //（4）判断这个完全四边形是不是生成过的，没生成就生成一个new的
-        //    Point p1 = uniquePoints[0];
-        //    Point p2 = uniquePoints[1];
-        //    Point p3 = uniquePoints[2];
+            };
+            List<Point> uniquePoints = points.Distinct().ToList();
+            if (uniquePoints.Count != 6) return;
+
+            //（3）每条等式是不是都有重复的一个点，拿出来
 
 
-        //    Point p4 = eq1.SegLR1.point2;
-        //    Point p5 = eq1.SegLR2.point2;
-        //    Point p6 = eq1.SegLR3.point2;
-
-        //    CompleteQuadriliateral pred = CqNormaliza(p1, p2, p3, p4, p5, p6);
-        //    pred.AddReason();
-        //    pred.AddCondition(eq1);
-        //    AddProcessor.Add(pred);
-
-        //    //getter里面取
-        //    Line line1 = KnowledgeGetter.GetLine((Point)pred[0], (Point)pred[1], (Point)pred[3]);
-        //    Line line2 = KnowledgeGetter.GetLine((Point)pred[1], (Point)pred[2], (Point)pred[4]);
-        //    Line line3 = KnowledgeGetter.GetLine((Point)pred[2], (Point)pred[0], (Point)pred[5]);
-        //    Line line4 = KnowledgeGetter.GetLine((Point)pred[3], (Point)pred[4], (Point)pred[5]);
-        //    if (line1 == null)
-        //    {
-        //        line1 = new Line((Point)pred[0], (Point)pred[1], (Point)pred[3]);
-        //        line1.AddReason();
-        //        line1.AddCondition(pred);
-        //        AddProcessor.Add(line1);
-        //    }
-
-        //    if (line2 == null)
-        //    {
-        //        line2 = new Line((Point)pred[1], (Point)pred[2], (Point)pred[4]);
-        //        line2.AddReason();
-        //        line2.AddCondition(pred);
-        //        AddProcessor.Add(line2);
-        //    }
-        //    if (line3 == null)
-        //    {
-        //        line3 = new Line((Point)pred[2], (Point)pred[0], (Point)pred[5]);
-        //        line3.AddReason();
-        //        line3.AddCondition(pred);
-        //        AddProcessor.Add(line3);
-        //    }
+            uniquePoints.Remove(eq1.SegLR1.point2);
+            uniquePoints.Remove(eq1.SegLR2.point2);
+            uniquePoints.Remove(eq1.SegLR3.point2);
+            //（4）判断这个完全四边形是不是生成过的，没生成就生成一个new的
+            Point p1 = uniquePoints[0];
+            Point p2 = uniquePoints[1];
+            Point p3 = uniquePoints[2];
 
 
-        //    if (line4 == null)
-        //    {
-        //        line4 = new Line((Point)pred[3], (Point)pred[4], (Point)pred[5]);
-        //        line4.AddReason();
-        //        line4.AddCondition(pred);
-        //        AddProcessor.Add(line4);
-        //    }
+            Point p4 = eq1.SegLR1.point2;
+            Point p5 = eq1.SegLR2.point2;
+            Point p6 = eq1.SegLR3.point2;
 
-        //}
+            CompleteQuadriliateral pred = CqNormaliza(p1, p2, p3, p4, p5, p6);
+            pred.AddReason();
+            pred.AddCondition(eq1);
+            AddProcessor.Add(pred);
+
+            //getter里面取
+            Line line1 = KnowledgeGetter.GetLine((Point)pred[0], (Point)pred[1], (Point)pred[3]);
+            Line line2 = KnowledgeGetter.GetLine((Point)pred[1], (Point)pred[2], (Point)pred[4]);
+            Line line3 = KnowledgeGetter.GetLine((Point)pred[2], (Point)pred[0], (Point)pred[5]);
+            Line line4 = KnowledgeGetter.GetLine((Point)pred[3], (Point)pred[4], (Point)pred[5]);
+            if (line1 == null)
+            {
+                line1 = new Line((Point)pred[0], (Point)pred[1], (Point)pred[3]);
+                line1.AddReason();
+                line1.AddCondition(pred);
+                AddProcessor.Add(line1);
+            }
+
+            if (line2 == null)
+            {
+                line2 = new Line((Point)pred[1], (Point)pred[2], (Point)pred[4]);
+                line2.AddReason();
+                line2.AddCondition(pred);
+                AddProcessor.Add(line2);
+            }
+            if (line3 == null)
+            {
+                line3 = new Line((Point)pred[2], (Point)pred[0], (Point)pred[5]);
+                line3.AddReason();
+                line3.AddCondition(pred);
+                AddProcessor.Add(line3);
+            }
+
+
+            if (line4 == null)
+            {
+                line4 = new Line((Point)pred[3], (Point)pred[4], (Point)pred[5]);
+                line4.AddReason();
+                line4.AddCondition(pred);
+                AddProcessor.Add(line4);
+            }
+
+        }
         public void 比例式化简(SREE equation1, SLR segmentLengthRatio1)
         {
             
@@ -579,7 +579,7 @@ namespace GeoInferenceEngine.EquivalencePlaneGeometry.Imps.PlugIns.CompleteQuadr
         //       && eq2.Properties[0].Properties[2].ToString().Equals("D"))
         //        {
 
-        //            GeoEquation equation1 = new GeoEquation(1, 1);
+        //GeoEquation equation1 = new GeoEquation(1, 1);
         //            Segment AF = KnowledgeGetter.GetSegment((Point)eq1.Properties[0].Properties[0], (Point)eq1.Properties[2].Properties[1]);
         //            Segment FB = KnowledgeGetter.GetSegment((Point)eq1.Properties[2].Properties[1], (Point)eq2.Properties[0].Properties[1]);
         //            Segment BD = KnowledgeGetter.GetSegment((Point)eq2.Properties[0].Properties[1], (Point)eq2.Properties[0].Properties[2]);

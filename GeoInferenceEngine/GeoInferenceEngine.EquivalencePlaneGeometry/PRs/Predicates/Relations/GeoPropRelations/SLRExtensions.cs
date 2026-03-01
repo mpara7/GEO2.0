@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using GeoInferenceEngine.Knowledges.Models;
+using GeoInferenceEngine.EquivalencePlaneGeometry.Models.Exprs.ZExprs;
 
 namespace GeoInferenceEngine.EquivalencePlaneGeometry.PRs.Predicates.Relations.GeoPropRelations
 {
@@ -15,7 +17,7 @@ namespace GeoInferenceEngine.EquivalencePlaneGeometry.PRs.Predicates.Relations.G
         /// 将两个 SREE 相乘或相除，并自动约分掉共同的 SLR
         /// isDivision 为 true 表示 eq1 / eq2
         /// </summary>
-        public static SREE CombineAndCancel(SREE eq1, SREE eq2, bool isDivision, FormularBase formularBase)
+        public static SREE CombineAndCancel(SREE eq1, SREE eq2, bool isDivision)
         {
             var factors = new List<SLR>();
 
@@ -77,6 +79,9 @@ namespace GeoInferenceEngine.EquivalencePlaneGeometry.PRs.Predicates.Relations.G
     }
     public static class SLRExtensions
     {
+
+        
+
         /// <summary>
         /// 判断两个 SLR 是否实质上是同一个线段比（例如 A-B-C 和 A-B-C）
         /// </summary>
@@ -104,6 +109,40 @@ namespace GeoInferenceEngine.EquivalencePlaneGeometry.PRs.Predicates.Relations.G
         {
             // 构造倒数 SLR，点的顺序反转，代数值取倒数
             return new SLR(slr.point3, slr.point2, slr.point1, slr.Expr.Invert());
+        }
+    }
+
+    public static class SREEToEquationExtensions
+    {
+        /// <summary>
+        /// 将 SREE (几何比例知识) 转换为原生的 GeoEquation (代数等式)
+        /// </summary>
+        public static GeoEquation ToGeoEquation(this SREE sree)
+        {
+            // 1. 构建代数表达式的左半边：一个大的乘除法节点
+            var leftPart = new ProductNode();
+
+            // 2. 遍历所有的 SLR 因子
+            foreach (var prop in sree.Properties.OfType<SLR>())
+            {
+                // 利用你提供的 Segment 类构造线段 (Segment 内部自带 Normalize 排序)
+                var segNum = new Segment(prop.point1, prop.point2);
+                var segDen = new Segment(prop.point2, prop.point3);
+
+                // 将线段的 Length 属性 (GeoProp) 包装为代数引擎的变量节点 (MutNode)
+                var mutNum = new MutNode(segNum.Length);
+                var mutDen = new MutNode(segDen.Length);
+
+                // 分子放入乘法区，分母放入除法区
+                leftPart.Multipliers.Add(mutNum);
+                leftPart.Divisors.Add(mutDen);
+            }
+
+            // 3. 构建等式 (左右两边都经过系统的自带化简)
+            Expr rightPart = sree.Expr.Clone();
+            var equation = new GeoEquation(leftPart.Simplify(), rightPart.Simplify());
+
+            return equation;
         }
     }
 }

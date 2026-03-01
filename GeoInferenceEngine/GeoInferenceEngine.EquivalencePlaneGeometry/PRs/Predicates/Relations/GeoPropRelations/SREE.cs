@@ -9,7 +9,7 @@ namespace GeoInferenceEngine.PlaneKnowledges.Knowledges;
 /// </summary>
 public class SREE : Knowledge
 {
-    
+    public bool IsSubsumed { get; set; } = false;
     public SLR SegLR1 { get => (SLR)Properties[0]; }
     public SLR SegLR2 { get => (SLR)Properties[1]; }
     public SLR SegLR3 { get => (SLR)Properties[2]; }

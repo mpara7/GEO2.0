@@ -18,12 +18,16 @@ namespace GeoInferenceEngine.EquivalencePlaneGeometry.Imps.Componments.Cal.CalEx
 
         [ZDI]
         private KnowledgeAddProcessor _knowledgeAddProcessor { get; set; }
+        [ZDI]
+        public CalAddProcessor _calAddProcessor { get; set; }
 
         public void ExecuteElimination()
         {
-            // 获取当前系统所有由梅涅劳斯等定理生成的 SREE 等式
-            var srees = _knowledgeBase.GetKnowledgesByType<SREE>().ToList();
-            if (srees.Count < 2) return;
+            if (_knowledgeBase == null || _knowledgeAddProcessor == null || _calAddProcessor == null) return;
+            // 检查全局知识库是否包含 SREE
+            if (!_knowledgeBase.Categories.ContainsKey(typeof(SREE))) return;
+            var sreesList = _knowledgeBase.Categories[typeof(SREE)];
+            if (sreesList == null) return;
 
             bool systemChanged = true;
 
@@ -32,8 +36,9 @@ namespace GeoInferenceEngine.EquivalencePlaneGeometry.Imps.Componments.Cal.CalEx
             {
                 systemChanged = false;
 
-                // 1. 统计所有的 SLR 签名，寻找可以作为“消元目标”的项
-                var slrPool = srees.SelectMany(s => s.Properties.Cast<SLR>()).ToList();
+                // 【核心防御】：只提取那些“还没被吸收废弃”的新鲜 SREE 来操作
+                var activeSrees = sreesList.OfType<SREE>().Where(e => !e.IsSubsumed).ToList();
+                if (activeSrees.Count < 2) break;
 
                 SLR targetToEliminate = null;
                 SREE pivotEq = null;
@@ -41,15 +46,15 @@ namespace GeoInferenceEngine.EquivalencePlaneGeometry.Imps.Componments.Cal.CalEx
                 bool isDivision = false;
 
                 // 2. 寻找任意两个包含相同（或互为倒数）SLR 的 SREE 方程
-                foreach (var eq1 in srees)
+                foreach (var eq1 in activeSrees)
                 {
-                    foreach (var eq2 in srees)
+                    foreach (var eq2 in activeSrees)
                     {
                         if (eq1 == eq2) continue;
 
-                        foreach (var slr1 in eq1.Properties.Cast<SLR>())
+                        foreach (var slr1 in eq1.Properties.OfType<SLR>())
                         {
-                            foreach (var slr2 in eq2.Properties.Cast<SLR>())
+                            foreach (var slr2 in eq2.Properties.OfType<SLR>())
                             {
                                 // 发现两个方程包含完全相同的项 -> 除法消元
                                 if (slr1.IsSameRatio(slr2))
@@ -72,18 +77,24 @@ namespace GeoInferenceEngine.EquivalencePlaneGeometry.Imps.Componments.Cal.CalEx
 
             Found:
                 // 3. 执行消元
-                if (targetToEliminate != null)
+                if (targetToEliminate is not null)
                 {
-                    // 把 eq1 和 eq2 组合，约掉 targetToEliminate
-                    SREE combinedEq = SREECombiner.CombineAndCancel(pivotEq, targetEq, isDivision, null);
+                    // 【软删除机制】：打上吸收标签，不从黑板物理删除，保护推理树
+                    pivotEq.IsSubsumed = true;
+                    targetEq.IsSubsumed = true;
 
-                    // 【核心】从工作区中移除老的，防止产生 10000 条废方程的组合爆炸！
-                    srees.Remove(pivotEq);
-                    srees.Remove(targetEq);
-                    srees.Add(combinedEq);
-
-                    // 将成功化简出的、更短的等式加入知识库
+                    // 生成新方程并交由系统录入
+                    SREE combinedEq = SREECombiner.CombineAndCancel(pivotEq, targetEq, isDivision);
                     _knowledgeAddProcessor.Add(combinedEq);
+
+                    // ================== 核心新增 ==================
+                    // 2. 将化简后的结果转换为系统原生代数等式，并交给代数引擎！
+                    GeoEquation geoEq = combinedEq.ToGeoEquation();
+                    geoEq.Reason = "由SREE贪心消元等价转换得出";
+
+                    // 将新等式加入系统的代数计算池，供高斯消元等后续模块使用
+                    _calAddProcessor.Add(geoEq);
+                    // ==============================================
 
                     systemChanged = true;
                 }

@@ -37,6 +37,47 @@ namespace GeoInferenceEngine.EquivalencePlaneGeometry.Imps.Componments.StopJudge
                 {
                     foreach (var newKnowledge in newKnowledges)
                     {
+                        bool isHit = false; // 标记是否命中目标
+                        if (newKnowledge.GetType() == unProved.Target.GetType())
+                        {
+                            // 如果目标是三点共线知识 (ColineKnowledge)
+                            if (unProved.Target is Line targetColine && newKnowledge is Line newColine)
+                            {
+                                // 把点抓出来变成名字集合 (比如 {"L", "M", "N"})
+                                var targetPoints = new HashSet<string>(targetColine.Points.Select(p => p.Name));
+                                var newPoints = new HashSet<string>(newColine.Points.Select(p => p.Name));
+
+                                // 只要推导出的线上，包含了目标线上的所有点，就算证明成功！
+                                if (targetPoints.IsSubsetOf(newPoints))
+                                {
+                                    isHit = true;
+                                }
+                            }
+                        }
+
+                        // 如果判定命中目标，执行成功的逻辑
+                        if (isHit)
+                        {
+                            if (unProved.Target.Expr is null)
+                            {
+                                unProved.IsSuccess = true;
+                                unProved.Conclusion = newKnowledge;
+                            }
+                            else
+                            {
+                                if (newKnowledge.Expr.Equals(unProved.Target.Expr))
+                                {
+                                    unProved.IsSuccess = true;
+                                    unProved.Conclusion = newKnowledge;
+                                    AppInfo.IsActivedStop = true;
+                                }
+                                else
+                                {
+                                    AppInfo.IsActivedStop = true;
+                                    AppInfo.ActivedStopReasons.Add($"已证明结果不成立{newKnowledge}\n");
+                                }
+                            }
+                        }
                         var a = UlongTool.UlongToStr(newKnowledge.HashCode);
                         var b = UlongTool.UlongToStr(unProved.Target.HashCode);
                         if (newKnowledge.HashCode == unProved.Target.HashCode)
@@ -84,7 +125,7 @@ namespace GeoInferenceEngine.EquivalencePlaneGeometry.Imps.Componments.StopJudge
                 }
             }
             // ================= 2. 【核心修复：检查等式证明目标】 =================
-            if (formularBase != null)
+            if (formularBase is not null)
             {
                 foreach (var unProvedEq in targetBase.EquationTargetInfos.Where(i => !i.IsSuccess).ToList())
                 {

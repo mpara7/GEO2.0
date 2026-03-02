@@ -29,6 +29,9 @@ namespace GeoInferenceEngine.EquivalencePlaneGeometry.Imps.Componments.Cal.CalEx
         // ========================================================
         private HashSet<string> _processedPairs = new HashSet<string>();
 
+        // 记录已经存在于池子里的 SREE 的指纹，防止重复添加等价等式
+        private HashSet<string> _uniqueSreeHashes = new HashSet<string>();
+
         public void ExecuteElimination()
         {
 
@@ -40,6 +43,12 @@ namespace GeoInferenceEngine.EquivalencePlaneGeometry.Imps.Componments.Cal.CalEx
             // 获取所有 SREE（不再使用 IsSubsumed 过滤，所有等式都可以参与多元反应）
             var activeSrees = _knowledgeBase.Categories[typeof(SREE)].OfType<SREE>().ToList();
             if (activeSrees.Count < 2) return;
+
+            _uniqueSreeHashes.Clear();
+            foreach (var sree in activeSrees)
+            {
+                _uniqueSreeHashes.Add(sree.ToString()); // 把初始条件的指纹录入
+            }
 
             bool systemChanged = true;
 
@@ -97,16 +106,38 @@ namespace GeoInferenceEngine.EquivalencePlaneGeometry.Imps.Componments.Cal.CalEx
                             SREE combinedEq = SREECombiner.CombineAndCancel(eq1, eq2, isDivision);
 
                             // ========================================================
-                            // 【防爆卡口】：只保留化简后剩余 SLR 数量 <= 4 的等式！
-                            // 两个梅涅劳斯合并后恰好是 4 项，符合条件。5项以上的直接抛弃。
+                            // 【三重防爆卡口】
+                            // 1. 长度拦截：过滤掉冗长的无意义等式
+                            // 2. 结果去重：如果这个等式的最终化简形态早就生成过了，直接丢弃！
+                            // 3. 内存保护：如果这一轮生成的新等式太多，直接熔断！
                             // ========================================================
-                            if (combinedEq.Properties.Count <= 4)
+                            if (combinedEq.Properties.Count <= 8)
                             {
-                                // 将它们打包成一个元组塞进列表
-                                newGeneratedSrees.Add((combinedEq, eq1, eq2));
+                                string newHash = combinedEq.ToString(); // 获取新等式的指纹
+
+                                // 如果指纹库里没有这个等式，才允许它活下来
+                                if (!_uniqueSreeHashes.Contains(newHash))
+                                {
+                                    _uniqueSreeHashes.Add(newHash); // 录入指纹库
+                                    newGeneratedSrees.Add((combinedEq, eq1, eq2)); // 打包加入列表
+                                }
+                            }
+
+                            // 【内存终极保护伞】：如果池子里的有效等式超过 1500 个，强行终止双重循环！
+                            if (activeSrees.Count + newGeneratedSrees.Count > 1500)
+                            {
+                                goto ExplosionFuse; // 触发熔断跳出
                             }
                         }
+                    
                     }
+                }
+            ExplosionFuse:
+                if (activeSrees.Count + newGeneratedSrees.Count > 1500)
+                {
+                    // 你可以用系统的 Logger 打印一句警告，告诉你这道题太复杂了
+                    //Logger.Warn("SREE贪心消元触发 1500 容量熔断！内存保卫战胜利！");
+                    systemChanged = false; // 强行让外层的 while 循环在这一轮结束后停止
                 }
                 // 5. 将本轮新生成的“精简等式”加入系统，触发下一轮连锁反应
                 if (newGeneratedSrees.Count > 0)
@@ -159,7 +190,7 @@ namespace GeoInferenceEngine.EquivalencePlaneGeometry.Imps.Componments.Cal.CalEx
                                         }
                                     }
                                     // 退一步：如果类型不完全是 GeoEquation，但是底层的代数表达式 Expr 一模一样
-                                    else if (unProved.Target.Expr != null && geoEq.Expr != null)
+                                    else if (unProved.Target.Expr is not null && geoEq.Expr is not null)
                                     {
                                         if (unProved.Target.Expr.Equals(geoEq.Expr))
                                         {

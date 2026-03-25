@@ -3,12 +3,39 @@ using System.Linq;
 using GeoInferenceEngine.EquivalencePlaneGeometry.Imps.Componments.PRs.PairMakers;
 using GeoInferenceEngine.EquivalencePlaneGeometry.Models.Exprs.ZExprs;
 using GeoInferenceEngine.PlaneKnowledges.Knowledges;
+using GeoInferenceEngine.EquivalencePlaneGeometry.Imps.DataBases;
+using System.Reflection;
+
 
 namespace GeoInferenceEngine.EquivalencePlaneGeometry.Imps.PlugIns.CompleteQuadrilateralInferencePlugIns
 {
     public class CompleteQuadInferenceRule : PlaneRuleClass
     {
+        [ZDI]
+        public TargetBase _targetBase { get; set; }
+        public CompleteQuadInferenceRule()
+        {
+            
+        }
+        // 1. 在类的顶部（或系统的知识库上下文中）定义一个全局哈希墙
+        // 用于记录已经生成过的完全四边形的唯一拓扑指纹
+        private static HashSet<string> _globalCQHashSet = new HashSet<string>();
 
+        // 2. 编写一个生成唯一指纹的方法（底层代数化简的轻量级替代）
+        private string GetCanonicalHash(Point p1, Point p2, Point p3, Point p4, Point p5, Point p6)
+        {
+            // 将 6 个顶点放入列表
+            List<string> pointNames = new List<string> {
+        p1.Name, p2.Name, p3.Name, p4.Name, p5.Name, p6.Name
+    };
+
+            // 核心算法：字典序重排 (Lexicographical Sorting)
+            // 无论是 CEBAFD 还是 BDFCAE，排序后都会变成 A B C D E F
+            pointNames.Sort();
+
+            // 拼接成唯一指纹，例如 "A_B_C_D_E_F"
+            return string.Join("_", pointNames);
+        }
         [Combination]
         public void 判定完全四边形(LineIntersectionPoint lineIntersectionPoint1, LineIntersectionPoint lineIntersectionPoint2)
         {
@@ -67,26 +94,26 @@ namespace GeoInferenceEngine.EquivalencePlaneGeometry.Imps.PlugIns.CompleteQuadr
                 p6 = temp;
             }
 
-            CompleteQuadriliateral pred = new CompleteQuadriliateral(p1, p2, p3, p4, p5, p6);
+            CompleteQuadriliateral pred = CqNormaliza(p1, p2, p3, p4, p5, p6);
             pred.AddReason();
             pred.AddCondition(lineIntersectionPoint1, lineIntersectionPoint2);
             AddProcessor.Add(pred);
 
-            CompleteQuadriliateral pred2 = CqNormaliza(p3, p5, p6, p1, p2, p4);
+            //CompleteQuadriliateral pred2 = CqNormaliza(p3, p5, p6, p1, p2, p4);
 
-            pred2.AddReason();
-            pred2.AddCondition(lineIntersectionPoint1, lineIntersectionPoint2);
-            AddProcessor.Add(pred2);
+            //pred2.AddReason();
+            //pred2.AddCondition(lineIntersectionPoint1, lineIntersectionPoint2);
+            //AddProcessor.Add(pred2);
 
-            CompleteQuadriliateral pred3 = CqNormaliza(p1, p4, p6, p2, p3, p5);
-            pred3.AddReason();
-            pred3.AddCondition(lineIntersectionPoint1, lineIntersectionPoint2);
-            AddProcessor.Add(pred3);
+            //CompleteQuadriliateral pred3 = CqNormaliza(p1, p4, p6, p2, p3, p5);
+            //pred3.AddReason();
+            //pred3.AddCondition(lineIntersectionPoint1, lineIntersectionPoint2);
+            //AddProcessor.Add(pred3);
 
-            CompleteQuadriliateral pred4 = CqNormaliza(p2, p4, p5, p3, p1, p6);
-            pred4.AddReason();
-            pred4.AddCondition(lineIntersectionPoint1, lineIntersectionPoint2);
-            AddProcessor.Add(pred4);
+            //CompleteQuadriliateral pred4 = CqNormaliza(p2, p4, p5, p3, p1, p6);
+            //pred4.AddReason();
+            //pred4.AddCondition(lineIntersectionPoint1, lineIntersectionPoint2);
+            //AddProcessor.Add(pred4);
         }
         [Combination]
         public CompleteQuadriliateral CqNormaliza(Point p1, Point p2, Point p3, Point p4, Point p5, Point p6)
@@ -333,21 +360,159 @@ namespace GeoInferenceEngine.EquivalencePlaneGeometry.Imps.PlugIns.CompleteQuadr
 
         }
 
-        
 
-        public void 梅涅劳斯定理(CompleteQuadriliateral completeQuadriliateral)
+
+        public void 梅涅劳斯定理(CompleteQuadriliateral cq)
         {
-            
-            SLR ABBC = KnowledgeGetter.GetSegmentLengthRatio1((Point)completeQuadriliateral[0], (Point)completeQuadriliateral[3], (Point)completeQuadriliateral[1]);
-            SLR CDDF = KnowledgeGetter.GetSegmentLengthRatio1((Point)completeQuadriliateral[1], (Point)completeQuadriliateral[4], (Point)completeQuadriliateral[2]);
-            SLR FEEA = KnowledgeGetter.GetSegmentLengthRatio1((Point)completeQuadriliateral[2], (Point)completeQuadriliateral[5], (Point)completeQuadriliateral[0]);
+            // 1. 安全校验：如果当前没有 TargetBase 或者没有目标，直接返回
+            if (_targetBase == null) return;
 
-            //创建等式，创建一个新知识
-            Expr i = 1;
-            SREE equation = new SREE(i, ABBC, CDDF, FEEA);
-            equation.AddReason();
-            equation.AddCondition(completeQuadriliateral);
-            AddProcessor.Add(equation);
+            // 2. 遍历所有的目标 (假设你的 TargetBase 里面存放列表的属性叫 Targets 或类似名称，请根据实际属性名微调)
+            // 通常在原系统中可能是 _targetBase.Targets 或者 _targetBase.GetTargets()
+            // 这里以一个通用的获取列表方式为例
+            foreach (var target in _targetBase.ToSolves)
+            {
+                // 3. 检查该目标是否已经证明成功了，如果成功了就跳过，节约算力
+                if (target.IsSuccess) continue;
+
+                // 4. 【核心防御：动态反射探针】
+                // 获取当前 target 在运行时的真实子类类型，并探测它有没有叫 "Target" 的属性
+                PropertyInfo propInfo = target.GetType().GetProperty("Target");
+
+                // 如果这个目标对象没有 Target 属性（说明它不是我们要的类型），直接跳过
+                if (propInfo == null) continue;
+                // 动态提取出 Target 属性的值
+                object toSolveProp = propInfo.GetValue(target);
+
+                // 5. 运行时类型断言 (RTTI)：判断待证结论是否为共线线段比 (SLR)
+                if (toSolveProp is SLR targetSlr)
+                {
+                    // 提取待求线段比的三个点 (例如结论是 AF/FD)
+                    Point pA = (Point)targetSlr.point1;
+                    Point pF = (Point)targetSlr.point2; // 截点
+                    Point pD = (Point)targetSlr.point3;
+
+                    // 防御校验：判断这三个点是否全部在当前完全四边形的 6 个顶点中
+                    HashSet<Point> cqPoints = new HashSet<Point> {
+                    (Point)cq[0], (Point)cq[1], (Point)cq[2],
+                    (Point)cq[3], (Point)cq[4], (Point)cq[5]
+                     };
+                    if (!cqPoints.Contains(pA) || !cqPoints.Contains(pF) || !cqPoints.Contains(pD)) return;
+
+                    // 提取完全四边形的 4 条线
+                    List<HashSet<Point>> lines = new List<HashSet<Point>>
+                    {
+                        new HashSet<Point> { (Point)cq[0], (Point)cq[3], (Point)cq[1] },
+                        new HashSet<Point> { (Point)cq[1], (Point)cq[4], (Point)cq[2] },
+                        new HashSet<Point> { (Point)cq[2], (Point)cq[5], (Point)cq[0] },
+                        new HashSet<Point> { (Point)cq[3], (Point)cq[4], (Point)cq[5] }
+    };
+                    // --- 严格落实你的算法步骤 ---
+
+                    // (1) 确定目标线 (A,F,D 所在的线) 和 截线 (过 F，但不过 A、D 的线)
+                    HashSet<Point> baseLine = lines.FirstOrDefault(l => l.Contains(pA) && l.Contains(pF) && l.Contains(pD));
+                    HashSet<Point> transversalLine = lines.FirstOrDefault(l => l.Contains(pF) && !l.Contains(pA) && !l.Contains(pD));
+
+                    if (baseLine == null || transversalLine == null) return;
+
+                    // (2) 确定哪个三角形被哪条线所截：寻找第 3 个顶点 C
+                    // 逻辑：在 6 个点中，剔除基线AD上的点，剔除截线BEF上的点，剩下的那个孤立点绝对是 C
+                    Point pC = cqPoints.First(p => !baseLine.Contains(p) && !transversalLine.Contains(p));
+
+                    // 找到截线上的另外两个截点 (B 和 E)
+                    var otherTransversalPoints = transversalLine.Where(p => p != pF).ToList();
+                    Point pCut1 = otherTransversalPoints[0];
+                    Point pCut2 = otherTransversalPoints[1];
+
+                    // 将截点正确匹配到边 DC 和 CA 上
+                    Point cutOnDC = lines.First(l => l.Contains(pD) && l.Contains(pC)).First(p => p == pCut1 || p == pCut2);
+                    Point cutOnCA = lines.First(l => l.Contains(pA) && l.Contains(pC)).First(p => p == pCut1 || p == pCut2);
+
+                    // 组装最终唯一的等式： (A->F->D) * (D->CutOnDC->C) * (C->CutOnCA->A) = 1
+                    SLR ratioDC = KnowledgeGetter.GetSegmentLengthRatio1(pD, cutOnDC, pC);
+                    SLR ratioCA = KnowledgeGetter.GetSegmentLengthRatio1(pC, cutOnCA, pA);
+                    Expr o = 1;
+                    SREE preciseEquation = new SREE(o, targetSlr, ratioDC, ratioCA); // 极度精准，只生成 1 个！
+                    preciseEquation.AddReason();
+                    preciseEquation.AddCondition(cq);
+                    AddProcessor.Add(preciseEquation);
+                    return;
+                }
+            }
+        
+                    // 提取完全四边形的 6 个交点
+                    // 根据原有逻辑定义，这 6 个点构成的 4 条共线直线分别为：
+                    // L1: p0, p3, p1
+                    // L2: p1, p4, p2
+                    // L3: p2, p5, p0
+                    // L4: p3, p4, p5
+                    Point p0 = (Point)cq[0];
+            Point p1 = (Point)cq[1];
+            Point p2 = (Point)cq[2];
+            Point p3 = (Point)cq[3];
+            Point p4 = (Point)cq[4];
+            Point p5 = (Point)cq[5];
+
+            Expr one = 1;
+
+            // =========================================================
+            // 第 1 组：以 L4 (p3, p4, p5) 为截线，截三角形 (p0, p1, p2)
+            // =========================================================
+            SLR eq1_r1 = KnowledgeGetter.GetSegmentLengthRatio1(p0, p3, p1);
+            SLR eq1_r2 = KnowledgeGetter.GetSegmentLengthRatio1(p1, p4, p2);
+            SLR eq1_r3 = KnowledgeGetter.GetSegmentLengthRatio1(p2, p5, p0);
+
+            SREE equation1 = new SREE(one, eq1_r1, eq1_r2, eq1_r3);
+            equation1.AddReason();
+            equation1.AddCondition(cq);
+            AddProcessor.Add(equation1);
+
+            // =========================================================
+            // 第 2 组：以 L1 (p0, p3, p1) 为截线，截三角形 (p2, p5, p4)
+            // =========================================================
+            SLR eq2_r1 = KnowledgeGetter.GetSegmentLengthRatio1(p2, p0, p5);
+            SLR eq2_r2 = KnowledgeGetter.GetSegmentLengthRatio1(p5, p3, p4);
+            SLR eq2_r3 = KnowledgeGetter.GetSegmentLengthRatio1(p4, p1, p2);
+
+            SREE equation2 = new SREE(one, eq2_r1, eq2_r2, eq2_r3);
+            equation2.AddReason();
+            equation2.AddCondition(cq);
+            AddProcessor.Add(equation2);
+
+            // =========================================================
+            // 第 3 组：以 L2 (p1, p4, p2) 为截线，截三角形 (p0, p1, p3) 
+            // 严格拓扑闭环应为三角形 (p0, p3, p5)
+            // =========================================================
+            SLR eq3_r1 = KnowledgeGetter.GetSegmentLengthRatio1(p0, p1, p3);
+            SLR eq3_r2 = KnowledgeGetter.GetSegmentLengthRatio1(p3, p4, p5);
+            SLR eq3_r3 = KnowledgeGetter.GetSegmentLengthRatio1(p5, p2, p0);
+
+            SREE equation3 = new SREE(one, eq3_r1, eq3_r2, eq3_r3);
+            equation3.AddReason();
+            equation3.AddCondition(cq);
+            AddProcessor.Add(equation3);
+
+            // =========================================================
+            // 第 4 组：以 L3 (p2, p5, p0) 为截线，截三角形 (p1, p4, p3)
+            // =========================================================
+            SLR eq4_r1 = KnowledgeGetter.GetSegmentLengthRatio1(p1, p2, p4);
+            SLR eq4_r2 = KnowledgeGetter.GetSegmentLengthRatio1(p4, p5, p3);
+            SLR eq4_r3 = KnowledgeGetter.GetSegmentLengthRatio1(p3, p0, p1);
+
+            SREE equation4 = new SREE(one, eq4_r1, eq4_r2, eq4_r3);
+            equation4.AddReason();
+            equation4.AddCondition(cq);
+            AddProcessor.Add(equation4);
+            //SLR ABBC = KnowledgeGetter.GetSegmentLengthRatio1((Point)completeQuadriliateral[0], (Point)completeQuadriliateral[3], (Point)completeQuadriliateral[1]);
+            //SLR CDDF = KnowledgeGetter.GetSegmentLengthRatio1((Point)completeQuadriliateral[1], (Point)completeQuadriliateral[4], (Point)completeQuadriliateral[2]);
+            //SLR FEEA = KnowledgeGetter.GetSegmentLengthRatio1((Point)completeQuadriliateral[2], (Point)completeQuadriliateral[5], (Point)completeQuadriliateral[0]);
+
+            ////创建等式，创建一个新知识
+            //Expr i = 1;
+            //SREE equation = new SREE(i, ABBC, CDDF, FEEA);
+            //equation.AddReason();
+            //equation.AddCondition(completeQuadriliateral);
+            //AddProcessor.Add(equation);
 
 
         }
@@ -394,6 +559,16 @@ namespace GeoInferenceEngine.EquivalencePlaneGeometry.Imps.PlugIns.CompleteQuadr
             Point p5 = eq1.SegLR2.point2;
             Point p6 = eq1.SegLR3.point2;
 
+            string hashFingerprint = GetCanonicalHash(p1, p2, p3, p4, p5, p6);
+
+            // 【防爆熔断机制】如果哈希池中已经存在该指纹，说明是同构冗余，直接丢弃！
+            if (_globalCQHashSet.Contains(hashFingerprint))
+            {
+                return; // 状态空间坍缩，终止发散
+            }
+
+            // 如果是首次发现，将指纹打入哈希表
+            _globalCQHashSet.Add(hashFingerprint);
             CompleteQuadriliateral pred = CqNormaliza(p1, p2, p3, p4, p5, p6);
             pred.AddReason();
             pred.AddCondition(eq1);
@@ -439,15 +614,10 @@ namespace GeoInferenceEngine.EquivalencePlaneGeometry.Imps.PlugIns.CompleteQuadr
         }
         public void 比例式化简(SREE equation1, SLR segmentLengthRatio1)
         {
-            
-                if ((segmentLengthRatio1.point1.ToString() == "A" && segmentLengthRatio1.point2.ToString() == "N" && segmentLengthRatio1.point3.ToString() == "C")
-                       
-                       )
-                {
-                    int i = 1;
-                }
-                   
-            if(equation1.count == 4)
+
+
+
+            if (equation1.count == 4)
             {
                 int i = 1;
             }
@@ -459,7 +629,7 @@ namespace GeoInferenceEngine.EquivalencePlaneGeometry.Imps.PlugIns.CompleteQuadr
             List<SLR> pequtaion = new List<SLR>();//存放与segmentLengthRatio1不相等的SLR
             if (equation1.count >= 3)
             {
-            
+
                 foreach (var segment1 in equation1.Properties)
                 {
                     if (segment1 == segmentLengthRatio1)
@@ -486,17 +656,17 @@ namespace GeoInferenceEngine.EquivalencePlaneGeometry.Imps.PlugIns.CompleteQuadr
                     value = 1;
                 }
 
-                  SREE sREE = new SREE(value, pequtaion.ToArray());
+                SREE sREE = new SREE(value, pequtaion.ToArray());
                 sREE.AddReason();
                 sREE.AddCondition(equation1, segmentLengthRatio1);
                 AddProcessor.Add(sREE);
-                
+
                 if (sREE.count == 2)
                 {
                     GeoEquation equation3 = new GeoEquation(1, 1);
                     //if (value is FractionNode )
                     //{
-                        
+
                     //    foreach (var item in pequtaion)
                     //    {
                     //        Segment seg1 = KnowledgeGetter.GetSegment((Point)item.Properties[0], (Point)item.Properties[1]);
@@ -511,15 +681,15 @@ namespace GeoInferenceEngine.EquivalencePlaneGeometry.Imps.PlugIns.CompleteQuadr
                     //}
                     //else
                     //{
-                        foreach (var item in pequtaion)
-                        {
-                            Segment seg1 = KnowledgeGetter.GetSegment((Point)item.Properties[0], (Point)item.Properties[1]);
-                            Segment seg2 = KnowledgeGetter.GetSegment((Point)item.Properties[1], (Point)item.Properties[2]);
-                            var equation2 = new GeoEquation(seg1.Length / seg2.Length, 1);
-                            equation3 = equation3.Mul(equation2);
-                        }
-                    
-                        equation3.RightPart = value;
+                    foreach (var item in pequtaion)
+                    {
+                        Segment seg1 = KnowledgeGetter.GetSegment((Point)item.Properties[0], (Point)item.Properties[1]);
+                        Segment seg2 = KnowledgeGetter.GetSegment((Point)item.Properties[1], (Point)item.Properties[2]);
+                        var equation2 = new GeoEquation(seg1.Length / seg2.Length, 1);
+                        equation3 = equation3.Mul(equation2);
+                    }
+
+                    equation3.RightPart = value;
                     if ((pequtaion[0][0].ToString() == "A" && pequtaion[0][1].ToString() == "M" && pequtaion[0][2].ToString() == "B")
                         || (pequtaion[1][0].ToString() == "A" && pequtaion[1][1].ToString() == "M" && pequtaion[1][2].ToString() == "B")
                        )
@@ -551,18 +721,18 @@ namespace GeoInferenceEngine.EquivalencePlaneGeometry.Imps.PlugIns.CompleteQuadr
                 if (pequtaion.Count == 0) return;
                 if (!flag) return;
                 var value = equation1.Expr * segmentLengthRatio1.Expr.Invert();
-                SLR segmentLengthRatio =KnowledgeGetter.GetSegmentLengthRatio1((Point)pequtaion[0].Properties[0], (Point)pequtaion[0].Properties[1], (Point)pequtaion[0].Properties[2]);
-                if(segmentLengthRatio.Expr == 99 || segmentLengthRatio.Expr == expr)
+                SLR segmentLengthRatio = KnowledgeGetter.GetSegmentLengthRatio1((Point)pequtaion[0].Properties[0], (Point)pequtaion[0].Properties[1], (Point)pequtaion[0].Properties[2]);
+                if (segmentLengthRatio.Expr == 99 || segmentLengthRatio.Expr == expr)
                 {
                     segmentLengthRatio.Expr = value;
                     segmentLengthRatio.AddReason();
                     segmentLengthRatio.AddCondition(equation1, segmentLengthRatio1);
                     AddProcessor.Add(segmentLengthRatio);
                 }
-                
-                
+
+
             }
-            
+
 
         }
 

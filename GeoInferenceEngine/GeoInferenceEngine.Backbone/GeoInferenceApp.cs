@@ -92,6 +92,13 @@ public class GeoInferenceApp
         AppInfo.AppStatu = AppStatus.Waiting;
     }
 
+    void FinalizeRun()
+    {
+        GlobalTimer.Stop();
+        AppInfo.RunTime = GlobalTimer.Elapsed;
+    }
+
+
     /// <summary>
     /// 开始推理，直到结束
     /// </summary>
@@ -172,6 +179,7 @@ public class GeoInferenceApp
                     AppInfo.CreckedInfo.Detail = ex.Message;
                     AppInfo.CreckedInfo.CurAction = AppInfo.CurAction;
                     AppInfo.AppStatu = AppStatus.Cracked;
+                    FinalizeRun();
                 }
                 catch (Exception ex)
                 {
@@ -179,6 +187,7 @@ public class GeoInferenceApp
                     AppInfo.CreckedInfo.Detail = ex.Message;
                     AppInfo.CreckedInfo.CurAction = AppInfo.CurAction;
                     AppInfo.AppStatu = AppStatus.Cracked;
+                    FinalizeRun();
                 }
                 finally
                 {
@@ -212,6 +221,7 @@ public class GeoInferenceApp
         }
         if (AppInfo.AppStatu == AppStatus.Finished)
         {
+            FinalizeRun();
             engine.Release();
         }
     }
@@ -236,6 +246,7 @@ public class GeoInferenceApp
         }
         if (AppInfo.AppStatu == AppStatus.Finished)
         {
+            FinalizeRun();
             engine.Release();
         }
     }

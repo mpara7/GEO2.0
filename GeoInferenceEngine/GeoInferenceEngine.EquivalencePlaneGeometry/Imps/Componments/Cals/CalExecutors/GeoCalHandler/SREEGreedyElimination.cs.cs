@@ -103,7 +103,7 @@ namespace GeoInferenceEngine.EquivalencePlaneGeometry.Imps.Componments.Cal.CalEx
                         // 4. 执行合并
                         if (targetToEliminate is not null)
                         {
-                            SREE combinedEq = SREECombiner.CombineAndCancel(eq1, eq2, isDivision);
+                            SREE combinedEq = SREECombiner.消元(eq1, eq2, isDivision);
 
                             // ========================================================
                             // 【三重防爆卡口】
@@ -123,8 +123,8 @@ namespace GeoInferenceEngine.EquivalencePlaneGeometry.Imps.Componments.Cal.CalEx
                                 }
                             }
 
-                            // 【内存终极保护伞】：如果池子里的有效等式超过 1500 个，强行终止双重循环！
-                            if (activeSrees.Count + newGeneratedSrees.Count > 1500)
+                             //【内存终极保护伞】：如果池子里的有效等式超过 1500 个，强行终止双重循环！
+                            if (activeSrees.Count + newGeneratedSrees.Count > 342)
                             {
                                 goto ExplosionFuse; // 触发熔断跳出
                             }

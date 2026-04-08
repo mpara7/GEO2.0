@@ -118,6 +118,23 @@ namespace GeoInferenceEngine.EquivalencePlaneGeometry.Imps.PlugIns.CompleteQuadr
         [Combination]
         public CompleteQuadriliateral CqNormaliza(Point p1, Point p2, Point p3, Point p4, Point p5, Point p6)
         {
+            // === 新增功能：对前三点进行按字典顺序（字母顺序）排序 ===
+            // 这里使用 ToString() 获取点名进行比较，如果你的 Point 类是用 .Name 属性表示名字，
+            // 请将 p1.ToString() 替换为 p1.Name
+            if (string.Compare(p1.ToString(), p2.ToString()) > 0)
+            {
+                Point temp = p1; p1 = p2; p2 = temp;
+            }
+            if (string.Compare(p2.ToString(), p3.ToString()) > 0)
+            {
+                Point temp = p2; p2 = p3; p3 = temp;
+            }
+            if (string.Compare(p1.ToString(), p2.ToString()) > 0)
+            {
+                Point temp = p1; p1 = p2; p2 = temp;
+            }
+            // ========================================================
+
             //
             if (!(KnowledgeGetter.HasColine(p1, p2, p4)))
             {
@@ -734,6 +751,91 @@ namespace GeoInferenceEngine.EquivalencePlaneGeometry.Imps.PlugIns.CompleteQuadr
             }
 
 
+        }
+
+        public void 相交弦定理(Circle circle, LineIntersectionPoint cross)
+        {
+            Point p = (Point)cross[0];
+            Line line1 = (Line)cross[1];
+            Line line2 = (Line)cross[2];
+
+            if (line1 == line2) return;
+
+            // line1 上找该圆的两个弦端点，并判断 p 是否在内部
+            if (!TryGetChordEnds(circle, line1, p, out Point a, out Point b)) return;
+
+            // line2 上找该圆的两个弦端点，并判断 p 是否在内部
+            if (!TryGetChordEnds(circle, line2, p, out Point c, out Point d)) return;
+
+            // 五个点必须互异，排掉退化情况
+            if (new HashSet<ulong> { a.HashCode, b.HashCode, c.HashCode, d.HashCode, p.HashCode }.Count != 5)
+                return;
+
+            Segment ap = KnowledgeGetter.GetSegment(a, p);
+            Segment pb = KnowledgeGetter.GetSegment(p, b);
+            Segment cp = KnowledgeGetter.GetSegment(c, p);
+            Segment pd = KnowledgeGetter.GetSegment(p, d);
+
+            if (ap is null || pb is null || cp is null || pd is null) return;
+
+            GeoEquation pred = new GeoEquation(
+                ap.Length.Mul(pb.Length),
+                cp.Length.Mul(pd.Length)
+            );
+
+            pred.AddCondition("相交弦定理", circle, cross);
+            AddProcessor.Add(pred);
+        }
+        /// <summary>
+        /// 在给定圆和直线中，找出该直线与圆对应的两个圆上点，
+        /// 并且要求 crossPoint 在线上夹在这两个点之间
+        /// </summary>
+        private bool TryGetChordEnds(Circle circle, Line line, Point crossPoint, out Point end1, out Point end2)
+        {
+            end1 = null;
+            end2 = null;
+
+            // circle.Properties[0] 默认是圆心，后面才是圆上点
+            HashSet<ulong> circlePointHashCodes = circle.Properties
+                .Skip(1)
+                .OfType<Point>()
+                .Select(x => x.HashCode)
+                .ToHashSet();
+
+            // 取这条线上、又在该圆上的点，去掉交点本身
+            List<Point> chordPoints = line.Properties
+                .OfType<Point>()
+                .Where(x => x.HashCode != crossPoint.HashCode && circlePointHashCodes.Contains(x.HashCode))
+                .GroupBy(x => x.HashCode)
+                .Select(g => g.First())
+                .ToList();
+
+            // 相交弦情形下一条弦对应这个圆应当正好有两个端点
+            if (chordPoints.Count != 2) return false;
+
+            int indexP = IndexOfPoint(line, crossPoint);
+            int index1 = IndexOfPoint(line, chordPoints[0]);
+            int index2 = IndexOfPoint(line, chordPoints[1]);
+
+            if (indexP < 0 || index1 < 0 || index2 < 0) return false;
+
+            // 不用 PointWithInPoints，直接靠 Line 中的次序判断“内部”
+            if (!(Math.Min(index1, index2) < indexP && indexP < Math.Max(index1, index2)))
+                return false;
+
+            end1 = chordPoints[0];
+            end2 = chordPoints[1];
+            return true;
+        }
+
+        private int IndexOfPoint(Line line, Point point)
+        {
+            for (int i = 0; i < line.Properties.Count; i++)
+            {
+                if (line.Properties[i] is Point p && p.HashCode == point.HashCode)
+                    return i;
+            }
+            return -1;
         }
 
         //public void 比例式计算(SREE eq1, SREE eq2)

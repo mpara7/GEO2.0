@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using GeoInferenceEngine.EquivalencePlaneGeometry.Imps.Componments.Cal.CalExecutors.GeoCalHandler;
 
 namespace GeoInferenceEngine.EquivalencePlaneGeometry.Imps.Componments.Cal
 {
@@ -90,6 +91,12 @@ namespace GeoInferenceEngine.EquivalencePlaneGeometry.Imps.Componments.Cal
         KnowledgeAddProcessor AddProcessor { get; set; }
         [ZDI]
         FormularBase FormularBase { get; set; }
+        // ================== 1. 注入我们的贪心消元器 ==================
+        // 注意：如果你放在了不同的命名空间，记得在文件最上方加上 using
+        [ZDI]
+        public SREEGreedyElimination _sreeGreedyElimination { get; set; }
+
+
         public override void Init()
         {
         }
@@ -99,6 +106,15 @@ namespace GeoInferenceEngine.EquivalencePlaneGeometry.Imps.Componments.Cal
         {
             CheckRatioInfos();
             MakeNewKnowledges();
+            // ================== 2. 执行贪心消元 ==================
+            // 在系统完成简单的比例传递、并可能生成了新的 SREE 之后，
+            // 立刻执行贪心扫描，把长等式吃掉化简，并转换为 GeoEquation！
+            if (_sreeGreedyElimination != null)
+            {
+                _sreeGreedyElimination.ExecuteElimination();
+            }
+            // =====================================================
+
         }
         public void CheckRatioInfos()
         {

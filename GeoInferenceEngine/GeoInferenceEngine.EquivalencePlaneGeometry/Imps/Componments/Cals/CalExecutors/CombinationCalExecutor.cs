@@ -19,7 +19,7 @@ namespace GeoInferenceEngine.EquivalencePlaneGeometry.Imps.Componments.Cal.CalBy
             // 为什么放在这里？
             // 因为在梅涅劳斯定理产生 SREE 知识之后，或者系统刚好做完一轮基础的 MultiplyingEquations 之后，
             // 此时调用贪心消元，能以极快的速度把冗余的比例式“吃掉”，极大减轻后续高斯消元的计算压力！
-            _sreeGreedyElimination.ExecuteElimination();
+            //_sreeGreedyElimination.ExecuteElimination();
             calHanderStrategy.CalGaussianElimination();
         }
 

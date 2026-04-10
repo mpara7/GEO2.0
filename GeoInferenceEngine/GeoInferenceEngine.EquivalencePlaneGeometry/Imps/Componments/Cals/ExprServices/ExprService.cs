@@ -19,7 +19,7 @@ namespace GeoInferenceEngine.Knowledges.Imps.Componments
         public virtual void Init()
         {
             mapleApp = new MapleApp();
-            Mut.Record = (mut) => MutRefs.Add(mut.ToString(), mut);
+            Mut.Record = (mut) => MutRefs[mut.ToString()] = mut;
             zpreparer = preparer as ZScriptInputEnginePreparer;
         }
         #region 工具

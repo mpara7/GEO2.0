@@ -12,6 +12,10 @@ namespace GeoInferenceEngine.EquivalencePlaneGeometry.Imps.Componments.StopJudge
         KnowledgeBase knowledgeBase;
         [ZDI]
         TargetBase targetBase;
+
+        // 【核心新增】注入代数方程库，停机判断器必须查这里才知道等式有没有证出来
+        [ZDI]
+        public FormularBase formularBase { get; set; }
         internal override void Init()
         {
             if (targetBase.ToSolves.Count == 0 && targetBase.ToProves.Count == 0)
@@ -33,6 +37,47 @@ namespace GeoInferenceEngine.EquivalencePlaneGeometry.Imps.Componments.StopJudge
                 {
                     foreach (var newKnowledge in newKnowledges)
                     {
+                        bool isHit = false; // 标记是否命中目标
+                        if (newKnowledge.GetType() == unProved.Target.GetType())
+                        {
+                            // 如果目标是三点共线知识 (ColineKnowledge)
+                            if (unProved.Target is Line targetColine && newKnowledge is Line newColine)
+                            {
+                                // 把点抓出来变成名字集合 (比如 {"L", "M", "N"})
+                                var targetPoints = new HashSet<string>(targetColine.Points.Select(p => p.Name));
+                                var newPoints = new HashSet<string>(newColine.Points.Select(p => p.Name));
+
+                                // 只要推导出的线上，包含了目标线上的所有点，就算证明成功！
+                                if (targetPoints.IsSubsetOf(newPoints))
+                                {
+                                    isHit = true;
+                                }
+                            }
+                        }
+
+                        // 如果判定命中目标，执行成功的逻辑
+                        if (isHit)
+                        {
+                            if (unProved.Target.Expr is null)
+                            {
+                                unProved.IsSuccess = true;
+                                unProved.Conclusion = newKnowledge;
+                            }
+                            else
+                            {
+                                if (newKnowledge.Expr.Equals(unProved.Target.Expr))
+                                {
+                                    unProved.IsSuccess = true;
+                                    unProved.Conclusion = newKnowledge;
+                                    AppInfo.IsActivedStop = true;
+                                }
+                                else
+                                {
+                                    AppInfo.IsActivedStop = true;
+                                    AppInfo.ActivedStopReasons.Add($"已证明结果不成立{newKnowledge}\n");
+                                }
+                            }
+                        }
                         var a = UlongTool.UlongToStr(newKnowledge.HashCode);
                         var b = UlongTool.UlongToStr(unProved.Target.HashCode);
                         if (newKnowledge.HashCode == unProved.Target.HashCode)
@@ -79,7 +124,41 @@ namespace GeoInferenceEngine.EquivalencePlaneGeometry.Imps.Componments.StopJudge
                     }
                 }
             }
+            // ================= 2. 【核心修复：检查等式证明目标】 =================
+            if (formularBase is not null)
+            {
+                foreach (var unProvedEq in targetBase.EquationTargetInfos.Where(i => !i.IsSuccess).ToList())
+                {
+                    // 方法 A：优先使用 HashCode 精确匹配 (左边右边结构完全一致)
+                    if (formularBase.AllGeoEquationInfos.ContainsKey(unProvedEq.Target.HashCode))
+                    {
+                        unProvedEq.IsSuccess = true;
+                        unProvedEq.Conclusion = formularBase.AllGeoEquationInfos[unProvedEq.Target.HashCode].GeoEquation;
+                        AppInfo.IsActivedStop = true;
+                    }
+                    else
+                    {
+                        // 方法 B：退源匹配防漏网。
+                        // 如果输入的证明是 1 = X/Y，推导出的是 X/Y = 1，HashCode 会不一样，这里做交叉防漏判定
+                        foreach (var sysEqInfo in formularBase.DistanceMultiplicationGeoEquationInfos.Values)
+                        {
+                            bool isMatch =
+                                sysEqInfo.GeoEquation.ToString() == unProvedEq.Target.ToString() ||
+                                (sysEqInfo.GeoEquation.LeftPart.ToString() == unProvedEq.Target.RightPart.ToString() &&
+                                 sysEqInfo.GeoEquation.RightPart.ToString() == unProvedEq.Target.LeftPart.ToString());
 
+                            if (isMatch)
+                            {
+                                unProvedEq.IsSuccess = true;
+                                unProvedEq.Conclusion = sysEqInfo.GeoEquation;
+                                AppInfo.IsActivedStop = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            // =================================================================
             var allSolved = targetBase.ToProves.All(p => p.IsSuccess) && targetBase.ToSolves.All(p => p.IsSuccess);
             var finish = allSolved || EngineInfo.IsOutOfPair && !EngineInfo.HasNewKnowledge && !EngineInfo.HasNewEquation;
             if (finish)

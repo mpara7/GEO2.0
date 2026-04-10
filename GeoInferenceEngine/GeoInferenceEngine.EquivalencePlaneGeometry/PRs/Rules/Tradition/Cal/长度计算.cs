@@ -48,7 +48,10 @@ namespace GeoInferenceEngine.PlaneGeometry.Rules.Tradition.Cal
                     var ab = KnowledgeGetter.GetSegment(line[0], line[i]);
                     var bc = KnowledgeGetter.GetSegment(line[i], line[j]);
                     var ac = KnowledgeGetter.GetSegment(line[0], line[j]);
-
+                    if (ab is null || bc is null || ac is null)
+                    {
+                        return;
+                    }
                     var pred = new GeoEquation(ab.Length.Add(bc.Length), ac.Length);
                     pred.AddReason();
                     pred.AddCondition(line);

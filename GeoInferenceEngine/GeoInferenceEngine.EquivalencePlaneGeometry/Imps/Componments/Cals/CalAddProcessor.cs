@@ -116,6 +116,7 @@ namespace GeoInferenceEngine.EquivalencePlaneGeometry.Imps.Componments.Cal
                 FormularBase.AllGeoEquationInfos.Add(equationInfo.HashCode, equationInfo);
                 
             }
+            //替换
             else if (equationInfo.Type == GeoEquationTypes.Multiplication)
             {
                 if (equationInfo.SimplifiedGeoequation is not null)
@@ -128,15 +129,40 @@ namespace GeoInferenceEngine.EquivalencePlaneGeometry.Imps.Componments.Cal
                     {
                         FormularBase.DistanceMultiplicationGeoEquationInfos
                             .Add(equationInfo.HashCode, equationInfo);
+
+                        DistanceMultiplicationAdding?.Invoke(equationInfo);
                     }
                     else if (equationInfo.Unit == GeoEquationUnits.Angle)
                     {
                         FormularBase.AngleMultiplicationGeoEquationInfos
                             .Add(equationInfo.HashCode, equationInfo);
+
+                        AngleMultiplicationAdding?.Invoke(equationInfo);
                     }
                 }
                 FormularBase.AllGeoEquationInfos.Add(equationInfo.HashCode, equationInfo);
             }
+            //else if (equationInfo.Type == GeoEquationTypes.Multiplication)
+            //{
+            //    if (equationInfo.SimplifiedGeoequation is not null)
+            //    {
+            //        Add(equationInfo.SimplifiedGeoequation);
+            //    }
+            //    else
+            //    {
+            //        if (equationInfo.Unit == GeoEquationUnits.Distance)
+            //        {
+            //            FormularBase.DistanceMultiplicationGeoEquationInfos
+            //                .Add(equationInfo.HashCode, equationInfo);
+            //        }
+            //        else if (equationInfo.Unit == GeoEquationUnits.Angle)
+            //        {
+            //            FormularBase.AngleMultiplicationGeoEquationInfos
+            //                .Add(equationInfo.HashCode, equationInfo);
+            //        }
+            //    }
+            //    FormularBase.AllGeoEquationInfos.Add(equationInfo.HashCode, equationInfo);
+            //}
             else if (equationInfo.Type == GeoEquationTypes.Complex)
             {
                 if (equationInfo.Unit == GeoEquationUnits.Distance)

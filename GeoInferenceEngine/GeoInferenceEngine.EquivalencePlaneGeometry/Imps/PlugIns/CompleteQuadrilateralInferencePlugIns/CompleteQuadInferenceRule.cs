@@ -5,6 +5,9 @@ using GeoInferenceEngine.EquivalencePlaneGeometry.Models.Exprs.ZExprs;
 using GeoInferenceEngine.PlaneKnowledges.Knowledges;
 using GeoInferenceEngine.EquivalencePlaneGeometry.Imps.DataBases;
 using System.Reflection;
+using GeoInferenceEngine.EquivalencePlaneGeometry.PRs.Predicates.Relations.GeoPropRelations;
+using GeoInferenceEngine.PredicateShared.Models;
+
 
 
 namespace GeoInferenceEngine.EquivalencePlaneGeometry.Imps.PlugIns.CompleteQuadrilateralInferencePlugIns
@@ -453,6 +456,7 @@ namespace GeoInferenceEngine.EquivalencePlaneGeometry.Imps.PlugIns.CompleteQuadr
                     preciseEquation.AddReason();
                     preciseEquation.AddCondition(cq);
                     AddProcessor.Add(preciseEquation);
+
                     return;
                 }
             }
@@ -480,9 +484,13 @@ namespace GeoInferenceEngine.EquivalencePlaneGeometry.Imps.PlugIns.CompleteQuadr
             SLR eq1_r3 = KnowledgeGetter.GetSegmentLengthRatio1(p2, p5, p0);
 
             SREE equation1 = new SREE(one, eq1_r1, eq1_r2, eq1_r3);
-            equation1.AddReason();
-            equation1.AddCondition(cq);
-            AddProcessor.Add(equation1);
+            //equation1.AddReason();
+            //equation1.AddCondition(cq);
+            //AddProcessor.Add(equation1);
+
+            GeoEquation geq = equation1.ToGeoEquation();
+            geq.AddReason();
+            AddProcessor.Add(geq);
 
             // =========================================================
             // 第 2 组：以 L1 (p0, p3, p1) 为截线，截三角形 (p2, p5, p4)
@@ -492,9 +500,14 @@ namespace GeoInferenceEngine.EquivalencePlaneGeometry.Imps.PlugIns.CompleteQuadr
             SLR eq2_r3 = KnowledgeGetter.GetSegmentLengthRatio1(p4, p1, p2);
 
             SREE equation2 = new SREE(one, eq2_r1, eq2_r2, eq2_r3);
-            equation2.AddReason();
-            equation2.AddCondition(cq);
-            AddProcessor.Add(equation2);
+            //equation2.AddReason();
+            //equation2.AddCondition(cq);
+            //AddProcessor.Add(equation2);
+
+            GeoEquation geq2 = equation2.ToGeoEquation();
+            geq.AddReason();
+            AddProcessor.Add(geq2);
+
 
             // =========================================================
             // 第 3 组：以 L2 (p1, p4, p2) 为截线，截三角形 (p0, p1, p3) 
@@ -505,9 +518,13 @@ namespace GeoInferenceEngine.EquivalencePlaneGeometry.Imps.PlugIns.CompleteQuadr
             SLR eq3_r3 = KnowledgeGetter.GetSegmentLengthRatio1(p5, p2, p0);
 
             SREE equation3 = new SREE(one, eq3_r1, eq3_r2, eq3_r3);
-            equation3.AddReason();
-            equation3.AddCondition(cq);
-            AddProcessor.Add(equation3);
+            //equation3.AddReason();
+            //equation3.AddCondition(cq);
+            //AddProcessor.Add(equation3);
+
+            GeoEquation geq3 = equation3.ToGeoEquation();
+            geq.AddReason();
+            AddProcessor.Add(geq3);
 
             // =========================================================
             // 第 4 组：以 L3 (p2, p5, p0) 为截线，截三角形 (p1, p4, p3)
@@ -517,9 +534,13 @@ namespace GeoInferenceEngine.EquivalencePlaneGeometry.Imps.PlugIns.CompleteQuadr
             SLR eq4_r3 = KnowledgeGetter.GetSegmentLengthRatio1(p3, p0, p1);
 
             SREE equation4 = new SREE(one, eq4_r1, eq4_r2, eq4_r3);
-            equation4.AddReason();
-            equation4.AddCondition(cq);
-            AddProcessor.Add(equation4);
+            //equation4.AddReason();
+            //equation4.AddCondition(cq);
+            //AddProcessor.Add(equation4);
+
+            GeoEquation geq4 = equation4.ToGeoEquation();
+            geq.AddReason();
+            AddProcessor.Add(geq4);
             //SLR ABBC = KnowledgeGetter.GetSegmentLengthRatio1((Point)completeQuadriliateral[0], (Point)completeQuadriliateral[3], (Point)completeQuadriliateral[1]);
             //SLR CDDF = KnowledgeGetter.GetSegmentLengthRatio1((Point)completeQuadriliateral[1], (Point)completeQuadriliateral[4], (Point)completeQuadriliateral[2]);
             //SLR FEEA = KnowledgeGetter.GetSegmentLengthRatio1((Point)completeQuadriliateral[2], (Point)completeQuadriliateral[5], (Point)completeQuadriliateral[0]);
@@ -753,7 +774,7 @@ namespace GeoInferenceEngine.EquivalencePlaneGeometry.Imps.PlugIns.CompleteQuadr
 
         }
 
-        public void 相交弦定理(Circle circle, LineIntersectionPoint cross)
+        public void 圆幂定理(Circle circle, LineIntersectionPoint cross)
         {
             Point p = (Point)cross[0];
             Line line1 = (Line)cross[1];
@@ -761,72 +782,151 @@ namespace GeoInferenceEngine.EquivalencePlaneGeometry.Imps.PlugIns.CompleteQuadr
 
             if (line1 == line2) return;
 
-            // line1 上找该圆的两个弦端点，并判断 p 是否在内部
-            if (!TryGetChordEnds(circle, line1, p, out Point a, out Point b)) return;
+            if (!TryGetSecantEnds(circle, line1, p, out Point a, out Point b, out bool inner1)) return;
+            if (!TryGetSecantEnds(circle, line2, p, out Point c, out Point d, out bool inner2)) return;
 
-            // line2 上找该圆的两个弦端点，并判断 p 是否在内部
-            if (!TryGetChordEnds(circle, line2, p, out Point c, out Point d)) return;
-
-            // 五个点必须互异，排掉退化情况
-            if (new HashSet<ulong> { a.HashCode, b.HashCode, c.HashCode, d.HashCode, p.HashCode }.Count != 5)
-                return;
-
-            Segment ap = KnowledgeGetter.GetSegment(a, p);
+            Segment pa = KnowledgeGetter.GetSegment(p, a);
             Segment pb = KnowledgeGetter.GetSegment(p, b);
-            Segment cp = KnowledgeGetter.GetSegment(c, p);
+            Segment pc = KnowledgeGetter.GetSegment(p, c);
             Segment pd = KnowledgeGetter.GetSegment(p, d);
 
-            if (ap is null || pb is null || cp is null || pd is null) return;
+            if (pa is null || pb is null || pc is null || pd is null) return;
 
+            // 统一计算格式：左边乘除式 = 1
             GeoEquation pred = new GeoEquation(
-                ap.Length.Mul(pb.Length),
-                cp.Length.Mul(pd.Length)
+                pa.Length.Mul(pb.Length).Div(pc.Length).Div(pd.Length).Simplify(),
+                Expr.One
             );
-
-            pred.AddCondition("相交弦定理", circle, cross);
+            pred.AddReason();
+            pred.AddCondition(circle, cross);
             AddProcessor.Add(pred);
+
+            // 只有内部点情形，才额外补一条 2 因子 SREE
+            if (inner1 && inner2)
+            {
+                SLR r1 = KnowledgeGetter.GetSegmentLengthRatio1(a, p, b);
+                SLR r2 = KnowledgeGetter.GetSegmentLengthRatio1(d, p, c);
+
+                SREE sree = new SREE(Expr.One, r1, r2);
+                sree.AddReason();
+                sree.AddCondition(circle, cross);
+                AddProcessor.Add(sree);
+
+                GeoEquation geq = sree.ToGeoEquation();
+                geq.AddReason();
+                AddProcessor.Add(geq);
+            }
         }
-        /// <summary>
-        /// 在给定圆和直线中，找出该直线与圆对应的两个圆上点，
-        /// 并且要求 crossPoint 在线上夹在这两个点之间
-        /// </summary>
-        private bool TryGetChordEnds(Circle circle, Line line, Point crossPoint, out Point end1, out Point end2)
+        private bool TryGetSecantEnds(
+                Circle circle, Line line, Point p,
+                out Point end1, out Point end2,
+                out bool isInnerPoint)
         {
             end1 = null;
             end2 = null;
+            isInnerPoint = false;
 
-            // circle.Properties[0] 默认是圆心，后面才是圆上点
             HashSet<ulong> circlePointHashCodes = circle.Properties
                 .Skip(1)
                 .OfType<Point>()
                 .Select(x => x.HashCode)
                 .ToHashSet();
 
-            // 取这条线上、又在该圆上的点，去掉交点本身
-            List<Point> chordPoints = line.Properties
+            List<Point> secantPoints = line.Properties
                 .OfType<Point>()
-                .Where(x => x.HashCode != crossPoint.HashCode && circlePointHashCodes.Contains(x.HashCode))
+                .Where(x => x.HashCode != p.HashCode && circlePointHashCodes.Contains(x.HashCode))
                 .GroupBy(x => x.HashCode)
                 .Select(g => g.First())
                 .ToList();
 
-            // 相交弦情形下一条弦对应这个圆应当正好有两个端点
-            if (chordPoints.Count != 2) return false;
+            if (secantPoints.Count != 2) return false;
 
-            int indexP = IndexOfPoint(line, crossPoint);
-            int index1 = IndexOfPoint(line, chordPoints[0]);
-            int index2 = IndexOfPoint(line, chordPoints[1]);
+            int indexP = IndexOfPoint(line, p);
+            int index1 = IndexOfPoint(line, secantPoints[0]);
+            int index2 = IndexOfPoint(line, secantPoints[1]);
 
             if (indexP < 0 || index1 < 0 || index2 < 0) return false;
 
-            // 不用 PointWithInPoints，直接靠 Line 中的次序判断“内部”
-            if (!(Math.Min(index1, index2) < indexP && indexP < Math.Max(index1, index2)))
-                return false;
+            isInnerPoint = Math.Min(index1, index2) < indexP && indexP < Math.Max(index1, index2);
 
-            end1 = chordPoints[0];
-            end2 = chordPoints[1];
+            end1 = secantPoints[0];
+            end2 = secantPoints[1];
             return true;
         }
+
+        //public void 相交弦定理(Circle circle, LineIntersectionPoint cross)
+        //{
+        //    Point p = (Point)cross[0];
+        //    Line line1 = (Line)cross[1];
+        //    Line line2 = (Line)cross[2];
+
+        //    if (line1 == line2) return;
+
+        //    // line1 上找该圆的两个弦端点，并判断 p 是否在内部
+        //    if (!TryGetChordEnds(circle, line1, p, out Point a, out Point b)) return;
+
+        //    // line2 上找该圆的两个弦端点，并判断 p 是否在内部
+        //    if (!TryGetChordEnds(circle, line2, p, out Point c, out Point d)) return;
+
+        //    // 五个点必须互异，排掉退化情况
+        //    if (new HashSet<ulong> { a.HashCode, b.HashCode, c.HashCode, d.HashCode, p.HashCode }.Count != 5)
+        //        return;
+
+        //    Segment ap = KnowledgeGetter.GetSegment(a, p);
+        //    Segment pb = KnowledgeGetter.GetSegment(p, b);
+        //    Segment cp = KnowledgeGetter.GetSegment(c, p);
+        //    Segment pd = KnowledgeGetter.GetSegment(p, d);
+
+        //    if (ap is null || pb is null || cp is null || pd is null) return;
+
+        //    GeoEquation pred = new GeoEquation(
+        //       ap.Length.Mul(pb.Length).Div(cp.Length).Div(pd.Length).Simplify(), Expr.One
+        //    );
+
+        //    pred.AddCondition("相交弦定理", circle, cross);
+        //    AddProcessor.Add(pred);
+        //}
+        /// <summary>
+        /// 在给定圆和直线中，找出该直线与圆对应的两个圆上点，
+        /// 并且要求 crossPoint 在线上夹在这两个点之间
+        /// </summary>
+        //private bool TryGetChordEnds(Circle circle, Line line, Point crossPoint, out Point end1, out Point end2)
+        //{
+        //    end1 = null;
+        //    end2 = null;
+
+        //    // circle.Properties[0] 默认是圆心，后面才是圆上点
+        //    HashSet<ulong> circlePointHashCodes = circle.Properties
+        //        .Skip(1)
+        //        .OfType<Point>()
+        //        .Select(x => x.HashCode)
+        //        .ToHashSet();
+
+        //    // 取这条线上、又在该圆上的点，去掉交点本身
+        //    List<Point> chordPoints = line.Properties
+        //        .OfType<Point>()
+        //        .Where(x => x.HashCode != crossPoint.HashCode && circlePointHashCodes.Contains(x.HashCode))
+        //        .GroupBy(x => x.HashCode)
+        //        .Select(g => g.First())
+        //        .ToList();
+
+        //    // 相交弦情形下一条弦对应这个圆应当正好有两个端点
+        //    if (chordPoints.Count != 2) return false;
+
+        //    int indexP = IndexOfPoint(line, crossPoint);
+        //    int index1 = IndexOfPoint(line, chordPoints[0]);
+        //    int index2 = IndexOfPoint(line, chordPoints[1]);
+
+        //    if (indexP < 0 || index1 < 0 || index2 < 0) return false;
+
+        //    // 不用 PointWithInPoints，直接靠 Line 中的次序判断“内部”
+        //    if (!(Math.Min(index1, index2) < indexP && indexP < Math.Max(index1, index2)))
+        //        return false;
+
+        //    end1 = chordPoints[0];
+        //    end2 = chordPoints[1];
+        //    return true;
+        //}
 
         private int IndexOfPoint(Line line, Point point)
         {
@@ -837,6 +937,128 @@ namespace GeoInferenceEngine.EquivalencePlaneGeometry.Imps.PlugIns.CompleteQuadr
             }
             return -1;
         }
+
+        #region 特殊处理
+
+        public void GeoEquation识别梅涅劳斯逆定理条件(GeoEquationInfo equationInfo)
+        {
+            if (equationInfo is null) return;
+            GeoEquation识别梅涅劳斯逆定理条件(equationInfo.GeoEquation);
+        }
+
+        public void GeoEquation识别梅涅劳斯逆定理条件(GeoEquation eq)
+        {
+            if (!TryConvertGeoEquationToSREE(eq, out SREE sree)) return;
+
+            sree.AddReason();
+            sree.AddCondition(eq);
+            AddProcessor.Add(sree);
+        }
+
+        private bool TryConvertGeoEquationToSREE(GeoEquation eq, out SREE sree)
+        {
+            sree = null;
+            if (eq is null) return false;
+            if (!IsExprOne(eq.RightPart)) return false;
+
+            Expr simplifiedLeft = eq.LeftPart?.Clone()?.Simplify();
+            ProductNode product = simplifiedLeft as ProductNode;
+            if (product is null) return false;
+
+            if (!product.IsPositive) return false;
+            if (!IsExprOne(product.Constant)) return false;
+            if (product.Multipliers.Count != 3 || product.Divisors.Count != 3) return false;
+
+            List<Expr> divisors = product.Divisors
+                .Select(d => d.Clone().Simplify())
+                .ToList();
+
+            List<SLR> slrs = new List<SLR>();
+
+            foreach (var multiplier in product.Multipliers.Select(m => m.Clone().Simplify()))
+            {
+                bool matched = false;
+
+                for (int i = 0; i < divisors.Count; i++)
+                {
+                    if (TryBuildSlr(multiplier, divisors[i], out SLR slr))
+                    {
+                        slrs.Add(slr);
+                        divisors.RemoveAt(i);
+                        matched = true;
+                        break;
+                    }
+                }
+
+                if (!matched) return false;
+            }
+
+            if (slrs.Count != 3) return false;
+
+            sree = new SREE(Expr.One, slrs.ToArray());
+            return true;
+        }
+
+        private bool TryBuildSlr(Expr numeratorExpr, Expr denominatorExpr, out SLR slr)
+        {
+            slr = null;
+
+            if (!TryExtractSegment(numeratorExpr, out Segment numeratorSegment)) return false;
+            if (!TryExtractSegment(denominatorExpr, out Segment denominatorSegment)) return false;
+
+            Point n1 = (Point)numeratorSegment[0];
+            Point n2 = (Point)numeratorSegment[1];
+            Point d1 = (Point)denominatorSegment[0];
+            Point d2 = (Point)denominatorSegment[1];
+
+            Point commonPoint = null;
+
+            if (n1.HashCode == d1.HashCode || n1.HashCode == d2.HashCode)
+                commonPoint = n1;
+            else if (n2.HashCode == d1.HashCode || n2.HashCode == d2.HashCode)
+                commonPoint = n2;
+
+            if (commonPoint == null) return false;
+
+            Point p1 = n1.HashCode == commonPoint.HashCode ? n2 : n1;
+            Point p3 = d1.HashCode == commonPoint.HashCode ? d2 : d1;
+
+            if (p1.HashCode == p3.HashCode) return false;
+            if (!KnowledgeGetter.HasColine(p1, commonPoint, p3)) return false;
+
+            slr = KnowledgeGetter.GetSegmentLengthRatio1(p1, commonPoint, p3);
+            return slr is not null;
+        }
+
+        private bool TryExtractSegment(Expr expr, out Segment segment)
+        {
+            segment = null;
+            if (expr == null) return false;
+
+            Expr simplified = expr.Clone().Simplify();
+
+            if (simplified is MutNode mutNode &&
+                mutNode.Mut is GeoProp geoProp &&
+                geoProp.Knowledge is Segment seg)
+            {
+                segment = seg;
+                return true;
+            }
+
+            return false;
+        }
+
+        private bool IsExprOne(Expr expr)
+        {
+            if (expr == null) return false;
+            return expr.Clone().Simplify().ToString() == Expr.One.ToString();
+        }
+
+
+
+
+        #endregion
+
 
         //public void 比例式计算(SREE eq1, SREE eq2)
         //{

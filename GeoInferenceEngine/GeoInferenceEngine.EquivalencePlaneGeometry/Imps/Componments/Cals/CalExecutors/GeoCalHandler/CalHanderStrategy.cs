@@ -71,7 +71,7 @@ public class CalHanderStrategy : IInferenceComponent
 
     //private int multingFlag = 0;
 
-    public const int MaxNodeNumbers = 10;
+    public const int MaxNodeNumbers = 14;
 
     #region 连加
 

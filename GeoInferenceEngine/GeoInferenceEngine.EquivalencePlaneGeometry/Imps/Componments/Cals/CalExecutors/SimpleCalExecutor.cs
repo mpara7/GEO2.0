@@ -109,10 +109,10 @@ namespace GeoInferenceEngine.EquivalencePlaneGeometry.Imps.Componments.Cal
             // ================== 2. 执行贪心消元 ==================
             // 在系统完成简单的比例传递、并可能生成了新的 SREE 之后，
             // 立刻执行贪心扫描，把长等式吃掉化简，并转换为 GeoEquation！
-            //if (_sreeGreedyElimination != null)
-            //{
-            //    _sreeGreedyElimination.ExecuteElimination();
-            //}
+            if (_sreeGreedyElimination != null)
+            {
+                _sreeGreedyElimination.ExecuteElimination();
+            }
             // =====================================================
 
         }

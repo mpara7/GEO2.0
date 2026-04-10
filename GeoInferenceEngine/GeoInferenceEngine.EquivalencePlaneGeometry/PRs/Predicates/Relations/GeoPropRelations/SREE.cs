@@ -1,6 +1,5 @@
 ﻿using System.Text;
 using GeoInferenceEngine.Knowledges;
-using GeoInferenceEngine.EquivalencePlaneGeometry.PRs.Predicates.Relations.GeoPropRelations;
 
 namespace GeoInferenceEngine.PlaneKnowledges.Knowledges;
 

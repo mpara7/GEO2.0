@@ -124,7 +124,7 @@ namespace GeoInferenceEngine.EquivalencePlaneGeometry.Imps.Componments.Cal.CalEx
                             }
 
                              //【内存终极保护伞】：如果池子里的有效等式超过 1500 个，强行终止双重循环！
-                            if (activeSrees.Count + newGeneratedSrees.Count > 456)
+                            if (activeSrees.Count + newGeneratedSrees.Count > 342)
                             {
                                 goto ExplosionFuse; // 触发熔断跳出
                             }

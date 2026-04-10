@@ -3,7 +3,6 @@ using GeoInferenceEngine.EquivalencePlaneGeometry.Imps.Componments.PRs.RuleProvi
 using GeoInferenceEngine.EquivalencePlaneGeometry.Imps.DataBases;
 using GeoInferenceEngine.Knowledges;
 using GeoInferenceEngine.PredicateShared.Models;
-using GeoInferenceEngine.EquivalencePlaneGeometry.Imps.Componments.Cal;
 
 namespace GeoInferenceEngine.EquivalencePlaneGeometry.Imps.PlugIns.CompleteQuadrilateralInferencePlugIns
 {
@@ -25,8 +24,6 @@ namespace GeoInferenceEngine.EquivalencePlaneGeometry.Imps.PlugIns.CompleteQuadr
         PlaneExecutor PlaneExecutor { get; set; }
         [ZDI]
         KnowledgeAddProcessor AddProcessor;
-        [ZDI]
-        CalAddProcessor CalAddProcessor;
         bool isInUse = false;
         public void Init()
         {
@@ -34,17 +31,6 @@ namespace GeoInferenceEngine.EquivalencePlaneGeometry.Imps.PlugIns.CompleteQuadr
             {
                 isInUse = true;
             };
-
-            CalAddProcessor.DistanceMultiplicationAdding += (equationInfo) =>
-            {
-                if (!isInUse) return;
-
-                var ruleObj = container.Get(typeof(CompleteQuadInferenceRule)) as CompleteQuadInferenceRule;
-                if (ruleObj == null) return;
-
-                ruleObj.GeoEquation识别梅涅劳斯逆定理条件(equationInfo);
-            };
-
             RuleProvider.ReBuilded += () =>
             {
                 if (!isInUse) return;

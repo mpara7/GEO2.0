@@ -19,7 +19,7 @@ namespace GeoInferenceEngine.Knowledges.Models
             RightPart = rightPart;
             Normalize();
             SetHashCode();
-            NodeNubmers();
+            //NodeNubmers();
         }
 
         public override void SetHashCode()
@@ -45,34 +45,22 @@ namespace GeoInferenceEngine.Knowledges.Models
             }
         }
 
-
-
-
-        public bool hasCodition(GeoEquation other)
+        public bool hasCodition(GeoEquation conditionPreds)
         {
-            if (other == null) return false;
-
-            HashSet<ulong> mySet = new HashSet<ulong>(AllConditionHashCode) { this.HashCode };
-            HashSet<ulong> otherSet = new HashSet<ulong>(other.AllConditionHashCode) { other.HashCode };
-
-            return mySet.Overlaps(otherSet);
-
-            //bool areEqual = new HashSet<ulong>(AllConditionHashCode).SetEquals(AllConditionHashCode);
-            //return areEqual;
+            bool areEqual = new HashSet<ulong>(AllConditionHashCode).SetEquals(AllConditionHashCode);
+            return areEqual;
         }
 
         #region 统计数量
+
         public void NodeNubmers()
         {
-            NodeNumber = 0;
-            CalNodeNubmers(LeftPart);
-            CalNodeNubmers(RightPart);
+            CalNodeNubmers(Expr.FromString(this.LeftPart.ToString().Replace("`", "")));
+            CalNodeNubmers(Expr.FromString(this.RightPart.ToString().Replace("`", "")));
         }
 
         private void CalNodeNubmers(Expr expr)
         {
-            if (expr is null) return;
-
             if (expr is SumNode sum)
             {
                 foreach (var item in sum.Addends)
@@ -87,51 +75,11 @@ namespace GeoInferenceEngine.Knowledges.Models
                 foreach (var item in product.Divisors)
                     CalNodeNubmers(item);
             }
-            else if (expr is PowerNode power)
-            {
-                CalNodeNubmers(power.Base);
-                CalNodeNubmers(power.Exponent);
-            }
-            else if (expr is TrigonometricNode tri)
-            {
-                CalNodeNubmers(tri.Expr);
-            }
             else
             {
                 NodeNumber++;
             }
         }
-
-
-
-
-        //public void NodeNubmers()
-        //{
-        //    CalNodeNubmers(Expr.FromString(this.LeftPart.ToString().Replace("`", "")));
-        //    CalNodeNubmers(Expr.FromString(this.RightPart.ToString().Replace("`", "")));
-        //}
-
-        //private void CalNodeNubmers(Expr expr)
-        //{
-        //    if (expr is SumNode sum)
-        //    {
-        //        foreach (var item in sum.Addends)
-        //            CalNodeNubmers(item);
-        //        foreach (var item in sum.Subtrahends)
-        //            CalNodeNubmers(item);
-        //    }
-        //    else if (expr is ProductNode product)
-        //    {
-        //        foreach (var item in product.Multipliers)
-        //            CalNodeNubmers(item);
-        //        foreach (var item in product.Divisors)
-        //            CalNodeNubmers(item);
-        //    }
-        //    else
-        //    {
-        //        NodeNumber++;
-        //    }
-        //}
 
         #endregion 统计数量
 

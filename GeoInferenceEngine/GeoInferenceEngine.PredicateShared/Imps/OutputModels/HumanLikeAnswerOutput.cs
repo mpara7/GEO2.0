@@ -14,7 +14,7 @@ public class QuestionHumanLikeAnswer
     public string Answer { get; set; } = "未成功解题";
     public override string ToString()
     {
-        
+        RunTime = GlobalTimer.Elapsed;
         var builder = new StringBuilder();
         if (RunTime.Hours > 0) builder.Append($"{RunTime.Hours}小时");
         if (RunTime.Minutes > 0) builder.Append($"{RunTime.Minutes}分");

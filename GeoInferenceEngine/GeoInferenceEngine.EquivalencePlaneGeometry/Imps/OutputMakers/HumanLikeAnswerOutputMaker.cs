@@ -2,12 +2,9 @@
 using GeoInferenceEngine.EquivalencePlaneGeometry.Imps.DataBases;
 using GeoInferenceEngine.Knowledges;
 using System.Reflection;
-using GeoInferenceEngine.Backbone;
-
 
 namespace GeoInferenceEngine.EquivalencePlaneGeometry.IO.Outputs
 {
-    
     public class HumanoidAnswerMakerConfig : AInferenceSetting
     {
         public bool IsSlim { get; set; } = true;
@@ -15,8 +12,6 @@ namespace GeoInferenceEngine.EquivalencePlaneGeometry.IO.Outputs
     [Description("类人答题生成器")]
     public class HumanLikeAnswerOutputMaker : IInferenceOutputMaker<HumanLikeAnswerOutput>
     {
-        [ZDI]
-        AppInfo appInfo;
         [ZDI]
         TargetBase tBase;
         [ZDI]
@@ -84,10 +79,7 @@ namespace GeoInferenceEngine.EquivalencePlaneGeometry.IO.Outputs
                 {
                     output.Answers.Add(new()
                     {
-                        
                         Index = item.Index + 1,
-
-                        RunTime = appInfo.RunTime,
                         IsSuccess = item.IsSuccess,
                         Question = item.ToString(),
                         Answer = MakeConditionStr(item.Conclusion)
@@ -98,7 +90,6 @@ namespace GeoInferenceEngine.EquivalencePlaneGeometry.IO.Outputs
                     output.Answers.Add(new()
                     {
                         Index = item.Index + 1,
-                        RunTime = appInfo.RunTime,
                         IsSuccess = item.IsSuccess,
                         Question = item.ToString(),
                         Answer = "无"
@@ -113,7 +104,6 @@ namespace GeoInferenceEngine.EquivalencePlaneGeometry.IO.Outputs
                     output.Answers.Add(new()
                     {
                         Index = item.Index + 1,
-                        RunTime = appInfo.RunTime,
                         IsSuccess = item.IsSuccess,
                         Question = item.ToString(),
                         Answer = MakeConditionStr(item.Conclusion)
@@ -124,7 +114,6 @@ namespace GeoInferenceEngine.EquivalencePlaneGeometry.IO.Outputs
                     output.Answers.Add(new()
                     {
                         Index = item.Index + 1,
-                        RunTime = appInfo.RunTime,
                         IsSuccess = item.IsSuccess,
                         Question = item.ToString(),
                         Answer = "无"

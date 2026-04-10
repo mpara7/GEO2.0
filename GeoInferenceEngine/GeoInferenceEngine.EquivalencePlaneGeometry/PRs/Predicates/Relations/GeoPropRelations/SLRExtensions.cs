@@ -12,7 +12,7 @@ namespace GeoInferenceEngine.EquivalencePlaneGeometry.PRs.Predicates.Relations.G
     using System.Collections.Generic;
     public static class SREECombiner
     {
-        public static SREE 消元(SREE eq1, SREE eq2, bool isDivision)
+        public static SREE CombineAndCancel(SREE eq1, SREE eq2, bool isDivision)
         {
             var factors = new List<SLR>();
 
